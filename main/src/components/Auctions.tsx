@@ -60,28 +60,6 @@ const Auctions = () => {
             })
     }
 
-    const checkCategory = (x: number) => {
-        // for(let item of category) {
-        //     console.log(item.categoryId)
-        //     if(x === item.categoryId) {
-        //         return item.name
-        //     } else {
-        //         return "Not Found"
-        //     }
-        // }
-
-        let name = ""
-        for(let i = 0; i < category.length; i++) {
-            if(x === category[i].categoryId){
-                name = category[i].name
-                return name
-            } else {
-                name = "Not Found"
-                return name
-            }
-        }
-    }
-
     const getAuctionImage = (x: any) => {
         axios.get('http://localhost:4941/api/v1/auctions/' + x.sellerId + "/image")
             .then((response) => {
@@ -107,28 +85,28 @@ const Auctions = () => {
         if (daysBetween < 0) {
             return <h6 style={{fontSize: "15px",
                 color: '#58111A'}}> Auction End </h6>
-        } if (daysBetween == 0) {
+        } if (daysBetween === 0) {
             return <h6 style={{fontSize: "15px",
                 color: '#FF0800'}}> Close Today </h6>
-        } if (daysBetween == 1) {
+        } if (daysBetween === 1) {
             return <h6 style={{fontSize: "15px",
                 color: '#CD5700'}}> Close Tomorrow </h6>
-        } if (daysBetween == 2) {
+        } if (daysBetween === 2) {
             return <h6 style={{fontSize: "15px",
                 color: '#FEBE10'}}> Close in 2 days </h6>
-        } if (daysBetween == 3) {
+        } if (daysBetween === 3) {
             return <h6 style={{fontSize: "15px",
                 color: '#FEBE10'}}> Close in 3 days </h6>
-        } if (daysBetween == 4) {
+        } if (daysBetween === 4) {
             return <h6 style={{fontSize: "15px",
                 color: '#FEBE10'}}> Close in 4 days </h6>
-        }if (daysBetween == 5) {
+        }if (daysBetween === 5) {
             return <h6 style={{fontSize: "15px",
                 color: '#FEBE10'}}> Close in 5 days </h6>
-        } if (daysBetween == 6) {
+        } if (daysBetween === 6) {
             return <h6 style={{fontSize: "15px",
                 color: '#FEBE10'}}> Close in 6 days </h6>
-        } if (daysBetween == 7) {
+        } if (daysBetween === 7) {
             return <h6 style={{fontSize: "15px",
                 color: '#FEBE10'}}> Close in a week </h6>
         } if (daysBetween > 7 && daysBetween < 14) {
@@ -199,7 +177,9 @@ const Auctions = () => {
                 <div style={{display:"inline-block",
                     width: "150px"}}>
                     <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline'}}> Category: </h6>
-                    <h6 style={{fontSize: "15px"}}> {checkCategory(row.categoryId)} </h6>
+                    <h6 style={{fontSize: "15px"}}> {category.filter(function checkCategory(x:any) {
+                        return x.categoryId === row.categoryId
+                    }).map((x) => x.name)} </h6>
                 </div>
                 <div style={{
                     width: "320px"}}>

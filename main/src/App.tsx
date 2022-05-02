@@ -4,13 +4,13 @@ import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import Auctions from "./components/Auctions";
 import Login from "./components/Login";
 import Auction from "./components/Auction";
-import Navbar from "./components/Navbar/Navbar";
+import Navbar from "./components/Navbar/NavbarDefault";
 function App() {
   return (
       <div className="App" style={{
           backgroundColor: "#5F9EA0"}}>
-          <Navbar />
         <Router>
+            <Navbar />
           <div>
             <Routes>
                 <Route path="/" element={<Auctions/>}/>

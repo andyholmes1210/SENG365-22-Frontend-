@@ -7,10 +7,8 @@ import {
     DialogActions,
     DialogContent, DialogContentText,
     DialogTitle,
-    Pagination,
     Paper,
-    Stack,
-    Typography
+    Stack, TableBody, TableCell, TableHead, TableRow,
 } from "@mui/material";
 import React from "react";
 import CSS from "csstype";
@@ -18,11 +16,14 @@ import axios from "axios";
 import ArrowCircleLeftOutlinedIcon from '@mui/icons-material/ArrowCircleLeftOutlined';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ArticleIcon from '@mui/icons-material/Article';
+import Navbar from "./Navbar/NavbarDefault";
+
 
 const Auction = () => {
     const [errorFlag, setErrorFlag] = React.useState(false)
     const [openBidderDialog, setOpenBidderDialog] = React.useState(false)
     const [errorMessage, setErrorMessage] = React.useState("")
+    const [category, setCategory] = React.useState<Array<Category>>([])
     const [auction, setAuction] = React.useState<Array<Auctions>>([{auctionId: 0,
         title: "",
         description: "",
@@ -80,10 +81,10 @@ const Auction = () => {
         setOpenBidderDialog(false);
     };
 
-
     React.useEffect(() => {
         getOneAuction()
         getAuctionBid()
+        getCategory()
     },[bids])
 
     const getOneAuction = () => {
@@ -110,6 +111,28 @@ const Auction = () => {
             })
     }
 
+    const getCategory = () => {
+        axios.get('http://localhost:4941/api/v1/auctions/categories')
+            .then((response) => {
+                setErrorFlag(false)
+                setErrorMessage("")
+                setCategory(response.data)
+            }, (error) => {
+                setErrorFlag(true)
+                setErrorMessage(error.toString())
+            })
+    }
+
+    const checkCategory = (x: number) => {
+        let name = ""
+        for(let i = 0; i < category.length; i++) {
+            if(x === category[i].categoryId){
+                name = category[i].name
+                return name
+            }
+        }
+    }
+
     const changeDate = (x: string) => {
         const date = new Date(x).toLocaleString()
         return date
@@ -125,18 +148,17 @@ const Auction = () => {
 
     const get_bidders_rows = () => {
         return (bids.map((row) =>
-                <tr>
-                    <td>{row.firstName}</td>
-                    <td>{row.lastName}</td>
-                    <td>{row.amount}</td>
-                    <td>test</td>
-                    <td>{changeDate(row.timestamp.toString())}</td>
-                    <td>
+                <TableRow hover
+                          tabIndex={-1}>
+                    <TableCell>{row.firstName}</TableCell>
+                    <TableCell>{row.lastName}</TableCell>
+                    <TableCell>${row.amount}</TableCell>
+                    <TableCell>{changeDate(row.timestamp.toString())}</TableCell>
+                    <TableCell>
                         <img style={{
                             height: "100px", width: "100px"}} src={"http://localhost:4941/api/v1/users/" + row.bidderId + "/image"}/>
-                    </td>
-                </tr>
-
+                    </TableCell>
+                </TableRow>
             )
         )
     }
@@ -152,7 +174,7 @@ const Auction = () => {
                     padding: "5px"}}>
                     <img style={{display:"inline-block",
                         height: "600px",
-                        width: "800px",}}
+                        width: "800px"}}
                          src={"http://localhost:4941/api/v1/auctions/" + auction.auctionId + "/image"}/>
                 </div>
                 <div style={{display:"inline-block",
@@ -164,15 +186,13 @@ const Auction = () => {
                     padding:"5px",
                     width: "1780px",
                     textAlign:"center"}}>
-                    <h2 style={heading}>Description:</h2>
+                    <h2 style={headingLeft}>Description:</h2>
                     <h2 style={{fontSize: "20px", textAlign:"left"}}>{auction.description}</h2>
                 </div>
                 <div style={{float:"left",
                     width: "890px",
                     padding:"5px"}}>
-                    <h2 style={{fontWeight: 'bold',
-                        textDecorationLine: 'underline',
-                        textAlign:"center"}}>Seller:</h2>
+                    <h2 style={headingCen}>Seller:</h2>
                     <h3> {auction.sellerFirstName} {auction.sellerLastName} </h3>
                     <img style={{
                         height: "100px", width: "150px"}} src={"http://localhost:4941/api/v1/users/" + auction.sellerId + "/image"}/>
@@ -180,9 +200,7 @@ const Auction = () => {
                 <div style={{float:"left",
                     width: "890px",
                     padding:"5px"}}>
-                    <h2 style={{fontWeight: 'bold',
-                        textDecorationLine: 'underline',
-                        textAlign:"center"}}>Current Bidder:</h2>
+                    <h2 style={headingCen}>Current Bidder:</h2>
                     <h3> {auction.sellerFirstName} {auction.sellerLastName} </h3>
                     <img style={{
                         height: "100px", width: "150px"}} src={"http://localhost:4941/api/v1/users/" + auction.sellerId + "/image"}/>
@@ -193,41 +211,31 @@ const Auction = () => {
                 <div style={{float:"left",
                     width: "592px",
                     padding:"5px"}}>
-                    <h2 style={{fontWeight: 'bold',
-                        textDecorationLine: 'underline',
-                        textAlign:"center"}}>Number of Bids:</h2>
+                    <h2 style={headingCen}>Number of Bids:</h2>
                     <h3> {auction.numBids} </h3>
                 </div>
                 <div style={{float:"left",
                     width: "592px",
                     padding:"5px"}}>
-                    <h2 style={{fontWeight: 'bold',
-                        textDecorationLine: 'underline',
-                        textAlign:"center"}}>Reserve Price:</h2>
+                    <h2 style={headingCen}>Reserve Price:</h2>
                     <h3> ${auction.reserve} </h3>
                 </div>
                 <div style={{float:"left",
                     width: "592px",
                     padding:"5px"}}>
-                    <h2 style={{fontWeight: 'bold',
-                        textDecorationLine: 'underline',
-                        textAlign:"center"}}>Current Bid:</h2>
+                    <h2 style={headingCen}>Current Bid:</h2>
                     <h3> ${checkNull(auction.highestBid)} </h3>
                 </div>
                 <div style={{float:"left",
                     width: "890px",
                     padding:"5px"}}>
-                    <h2 style={{fontWeight: 'bold',
-                        textDecorationLine: 'underline',
-                        textAlign:"center"}}>Category:</h2>
-                    <h3> {auction.categoryId} </h3>
+                    <h2 style={headingCen}>Category:</h2>
+                    <h3> {checkCategory(auction.categoryId)} </h3>
                 </div>
                 <div style={{float:"left",
                     width: "890px",
                     padding:"5px"}}>
-                    <h2 style={{fontWeight: 'bold',
-                        textDecorationLine: 'underline',
-                        textAlign:"center"}}>End Date:</h2>
+                    <h2 style={headingCen}>End Date:</h2>
                     <h3>test</h3>
                     {/*<h3> {changeDate(auction.endDate.toString())} </h3>*/}
                 </div>
@@ -257,7 +265,28 @@ const Auction = () => {
                             </DialogTitle>
                             <DialogContent>
                                 <DialogContentText id="alert-dialog-description">
-                                    {get_bidders_rows()}
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell style={headingCen}>
+                                                Firstname
+                                            </TableCell>
+                                            <TableCell style={headingCen}>
+                                                Lastname
+                                            </TableCell>
+                                            <TableCell style={headingCen}>
+                                                Amount
+                                            </TableCell>
+                                            <TableCell style={headingCen}>
+                                                Timestamp
+                                            </TableCell>
+                                            <TableCell style={headingCen}>
+                                                Profile Picture
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {get_bidders_rows()}
+                                    </TableBody>
                                 </DialogContentText>
                             </DialogContent>
                             <DialogActions>
@@ -270,7 +299,13 @@ const Auction = () => {
         )
     }
 
-    const heading: CSS.Properties = {
+    const headingCen: CSS.Properties = {
+        fontWeight: 'bold',
+        textDecorationLine: 'underline',
+        textAlign:"center"
+    }
+
+    const headingLeft: CSS.Properties = {
         fontWeight: 'bold',
         textDecorationLine: 'underline',
         textAlign:"left"
