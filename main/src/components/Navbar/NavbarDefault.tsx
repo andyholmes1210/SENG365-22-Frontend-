@@ -1,5 +1,8 @@
 import React from 'react'
 import {Nav, NavLink, NavMenu, NavBtn, NavBtnLink, Bars} from "./NavbarElement";
+import {Button} from "@mui/material";
+import LogoutIcon from '@mui/icons-material/Logout';
+import {Link} from "react-router-dom";
 
 
 const Navbar = () => {
@@ -20,9 +23,11 @@ const Navbar = () => {
                     </NavLink>
                 </NavMenu>
                 <NavBtn>
-                    <NavBtnLink to="/login">
-                       Logout
-                    </NavBtnLink>
+                    <Link to={"/login"}>
+                        <Button variant="contained" endIcon={<LogoutIcon/>}>
+                            Logout
+                        </Button>
+                    </Link>
                 </NavBtn>
             </Nav>
         </>

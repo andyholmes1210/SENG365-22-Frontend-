@@ -152,12 +152,13 @@ const Auctions = () => {
     const auction_rows = () => {
         return (auctions.map((row) =>
             <Paper elevation={15} style={{
-                display: "inline-block",
+                display:"inline-block",
                 height: "480px",
                 width: "330px",
-                margin: "60px",
+                margin: "55px",
                 padding: "5px",
-                textAlign: "center"}}>
+                textAlign: "center",
+             alignContent: "center"}}>
                 <div style={{
                     padding: "5px"}}>
                     <img style={{
