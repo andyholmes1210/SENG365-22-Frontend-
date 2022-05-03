@@ -1,4 +1,4 @@
-import {Link, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {
     Alert,
     AlertTitle,
@@ -20,11 +20,15 @@ import Navbar from "./Navbar/NavbarDefault";
 
 
 const Auction = () => {
+    let { id } = useParams();
     const [errorFlag, setErrorFlag] = React.useState(false)
     const [openBidderDialog, setOpenBidderDialog] = React.useState(false)
     const [errorMessage, setErrorMessage] = React.useState("")
     const [category, setCategory] = React.useState<Array<Category>>([])
-    const [auction, setAuction] = React.useState<Array<Auctions>>([{auctionId: 0,
+    // const [cateid, setCateId] = React.useState(0)
+    const [similarauction, setSimilarAuction] = React.useState<Array<Auctions>>([])
+    const navigate = useNavigate()
+    const [auction, setAuction] = React.useState<Auctions>({auctionId: 0,
                                                                             title: "",
                                                                             description: "",
                                                                             reserve: 0,
@@ -35,7 +39,7 @@ const Auction = () => {
                                                                             highestBid: 0,
                                                                             numBids: 0,
                                                                             endDate: new Date(),
-                                                                            image_filename: ""}])
+                                                                            image_filename: ""})
 
     const [bids, setBids] = React.useState<Array<Bid>>([{firstName: "firstName",
                                                                     lastName: "lastName",
@@ -64,8 +68,6 @@ const Auction = () => {
                                                                             user_id: 0,
                                                                             bidderId: 0})
 
-    let { id } = useParams();
-
     const handleBidderDialogOpen = (bids: Bid) => {
         setDialogBidder(bids)
         setOpenBidderDialog(true);
@@ -82,11 +84,23 @@ const Auction = () => {
         setOpenBidderDialog(false);
     };
 
+    // const [dialogSimilarAuction, setdialogSimilarAuction] = React.useState<Array<Auctions>>([])
+    // const [updateSimilarAuction, setupdateSimilarAuction] = React.useState<Array<Auctions>>([])
+    //
+    // const handleSimilarAuctionOpen = () => {
+    //
+    // }
+    //
+    // const handleSimilarAuctionClose = () => {
+    //
+    // }
+
+
     React.useEffect(() => {
         getOneAuction()
         getAuctionBid()
         getCategory()
-    },[bids])
+    },[])
 
     const getOneAuction = () => {
         axios.get('http://localhost:4941/api/v1/auctions/' + id)
@@ -94,18 +108,31 @@ const Auction = () => {
                 setErrorFlag(false)
                 setErrorMessage("")
                 setAuction(response.data)
+                getSimilarAuction(response.data.categoryId)
             }, (error) => {
                 setErrorFlag(true)
                 setErrorMessage(error.toString())
             })
     }
 
-    function getAuctionBid () {
+    const getAuctionBid = () => {
         axios.get('http://localhost:4941/api/v1/auctions/' + id + '/bids')
             .then((response) => {
                 setErrorFlag(false)
                 setErrorMessage("")
                 setBids(response.data)
+            }, (error) => {
+                setErrorFlag(true)
+                setErrorMessage(error.toString())
+            })
+    }
+
+    const getSimilarAuction = (id: number) => {
+        axios.get('http://localhost:4941/api/v1/auctions?categoryIds=' + id)
+            .then((response) => {
+                setErrorFlag(false)
+                setErrorMessage("")
+                setSimilarAuction(response.data.auction)
             }, (error) => {
                 setErrorFlag(true)
                 setErrorMessage(error.toString())
@@ -135,8 +162,7 @@ const Auction = () => {
     }
 
     const changeDate = (x: string) => {
-        const date = new Date(x).toLocaleString()
-        return date
+        return new Date(x).toLocaleString()
     }
 
     const checkNull = (x: any) => {
@@ -146,6 +172,17 @@ const Auction = () => {
             return x
         }
     }
+
+    // const get_similarauctions_rows = () => {
+    //     return (similarauction.map((row) =>
+    //             <TableRow hover
+    //                       tabIndex={-1}>
+    //                 <TableCell>Test</TableCell>
+    //
+    //             </TableRow>
+    //         )
+    //     )
+    // }
 
     const get_bidders_rows = () => {
         return (bids.map((row) =>
@@ -163,8 +200,6 @@ const Auction = () => {
             )
         )
     }
-
-
 
     const auction_detail_rows = (auction: any, bids: any) => {
         return (
@@ -190,17 +225,13 @@ const Auction = () => {
                     <h2 style={headingLeft}>Description:</h2>
                     <h2 style={{fontSize: "20px", textAlign:"left"}}>{auction.description}</h2>
                 </div>
-                <div style={{float:"left",
-                    width: "890px",
-                    padding:"5px"}}>
+                <div style={halfCell}>
                     <h2 style={headingCen}>Seller:</h2>
                     <h3> {auction.sellerFirstName} {auction.sellerLastName} </h3>
                     <img style={{
                         height: "100px", width: "150px"}} src={"http://localhost:4941/api/v1/users/" + auction.sellerId + "/image"}/>
                 </div>
-                <div style={{float:"left",
-                    width: "890px",
-                    padding:"5px"}}>
+                <div style={halfCell}>
                     <h2 style={headingCen}>Current Bidder:</h2>
                     <h3> {auction.sellerFirstName} {auction.sellerLastName} </h3>
                     <img style={{
@@ -209,40 +240,27 @@ const Auction = () => {
                     {/*<img style={{*/}
                     {/*    height: "100px", width: "150px"}} src={"http://localhost:4941/api/v1/users/" + bids.bidderId + "/image"}/>*/}
                 </div>
-                <div style={{float:"left",
-                    width: "592px",
-                    padding:"5px"}}>
+                <div style={oneThirdCell}>
                     <h2 style={headingCen}>Number of Bids:</h2>
                     <h3> {auction.numBids} </h3>
                 </div>
-                <div style={{float:"left",
-                    width: "592px",
-                    padding:"5px"}}>
+                <div style={oneThirdCell}>
                     <h2 style={headingCen}>Reserve Price:</h2>
                     <h3> ${auction.reserve} </h3>
                 </div>
-                <div style={{float:"left",
-                    width: "592px",
-                    padding:"5px"}}>
+                <div style={oneThirdCell}>
                     <h2 style={headingCen}>Current Bid:</h2>
                     <h3> ${checkNull(auction.highestBid)} </h3>
                 </div>
-                <div style={{float:"left",
-                    width: "890px",
-                    padding:"5px"}}>
+                <div style={halfCell}>
                     <h2 style={headingCen}>Category:</h2>
                     <h3> {checkCategory(auction.categoryId)} </h3>
                 </div>
-                <div style={{float:"left",
-                    width: "890px",
-                    padding:"5px"}}>
+                <div style={halfCell}>
                     <h2 style={headingCen}>End Date:</h2>
-                    <h3>test</h3>
-                    {/*<h3> {changeDate(auction.endDate.toString())} </h3>*/}
+                    <h3> {changeDate(auction.endDate.toString())} </h3>
                 </div>
-                <div style={{float:"left",
-                    width: "890px",
-                    padding:"5px"}}>
+                <div style={halfCell}>
                     <Stack direction="row" spacing={2} justifyContent="right">
                         <Button variant="contained" endIcon={<ArticleIcon/>}>
                             View Similar Auctions
@@ -250,9 +268,7 @@ const Auction = () => {
                     </Stack>
                 </div>
 
-                <div style={{float:"left",
-                    width: "890px",
-                    padding:"5px"}}>
+                <div style={halfCell}>
                     <Stack direction="row" spacing={2} justifyContent="left">
 
                         { auction.numBids > 0?
@@ -298,14 +314,26 @@ const Auction = () => {
                                     </TableBody>
                                 </DialogContentText>
                             </DialogContent>
-                            <DialogActions>
-                                <Button onClick={handleBidderDialogClose}>Close</Button>
-                            </DialogActions>
+                                <DialogActions>
+                                    <Button onClick={handleBidderDialogClose}>Close</Button>
+                                </DialogActions>
                         </Dialog>
                     </Stack>
                 </div>
             </Paper>
         )
+    }
+
+    const oneThirdCell: CSS.Properties = {
+        float: "left",
+        width: "592px",
+        padding: "5px"
+    }
+
+    const halfCell: CSS.Properties = {
+        float:"left",
+        width: "890px",
+        padding:"5px"
     }
 
     const headingCen: CSS.Properties = {
@@ -330,11 +358,9 @@ const Auction = () => {
     return (
         <Paper elevation={10} style={card}>
             <Stack direction="row" spacing={2} justifyContent="left">
-                <Link to={"/"}>
-                    <Button variant="contained" endIcon={<ArrowCircleLeftOutlinedIcon/>}>
-                        Go back
-                    </Button>
-                </Link>
+                <Button onClick={() => navigate("/")} variant="contained" endIcon={<ArrowCircleLeftOutlinedIcon/>}>
+                    Go back
+                </Button>
             </Stack>
             <h1 style={{fontSize: "50px",
                 textAlign: "center",

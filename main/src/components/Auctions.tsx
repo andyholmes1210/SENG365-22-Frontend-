@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import CSS from 'csstype';
 import ArticleIcon from '@mui/icons-material/Article';
 
@@ -24,6 +24,7 @@ const Auctions = () => {
     const [count, setCount] = React.useState(10)
     const [index, setIndex] = React.useState(0)
     const [totalpage, setTotalpage] = React.useState(0)
+    const navigate = useNavigate()
 
     const paginationPage = (event: React.ChangeEvent<unknown>, value: number) => {
         setIndex((value * count) - count)
@@ -81,7 +82,7 @@ const Auctions = () => {
     }
 
     const checkDate = (x: any) => {
-        const daysBetween: number = new Date(x).getDate() - new Date().getDate()
+        const daysBetween: number = (Math.trunc((new Date(x).getTime() - new Date().getTime())/(86400 * 1000)))
         if (daysBetween < 0) {
             return <h6 style={{fontSize: "15px",
                 color: '#58111A'}}> Auction End </h6>
@@ -91,39 +92,12 @@ const Auctions = () => {
         } if (daysBetween === 1) {
             return <h6 style={{fontSize: "15px",
                 color: '#CD5700'}}> Close Tomorrow </h6>
-        } if (daysBetween === 2) {
+        } if (daysBetween > 1 && daysBetween < 14) {
             return <h6 style={{fontSize: "15px",
-                color: '#FEBE10'}}> Close in 2 days </h6>
-        } if (daysBetween === 3) {
+                color: '#FEBE10'}}> Close in {daysBetween} days </h6>
+        } if (daysBetween >= 14) {
             return <h6 style={{fontSize: "15px",
-                color: '#FEBE10'}}> Close in 3 days </h6>
-        } if (daysBetween === 4) {
-            return <h6 style={{fontSize: "15px",
-                color: '#FEBE10'}}> Close in 4 days </h6>
-        }if (daysBetween === 5) {
-            return <h6 style={{fontSize: "15px",
-                color: '#FEBE10'}}> Close in 5 days </h6>
-        } if (daysBetween === 6) {
-            return <h6 style={{fontSize: "15px",
-                color: '#FEBE10'}}> Close in 6 days </h6>
-        } if (daysBetween === 7) {
-            return <h6 style={{fontSize: "15px",
-                color: '#FEBE10'}}> Close in a week </h6>
-        } if (daysBetween > 7 && daysBetween < 14) {
-            return <h6 style={{fontSize: "15px",
-                color: '#FEBE10'}}> Close in a week </h6>
-        } if (daysBetween >= 14 && daysBetween < 21) {
-            return <h6 style={{fontSize: "15px",
-                color: '#006400'}}> Close in 2 weeks </h6>
-        } if (daysBetween >= 21 && daysBetween < 28) {
-            return <h6 style={{fontSize: "15px",
-                color: '#006400'}}> Close in 3 weeks </h6>
-        } if (daysBetween >= 28 && daysBetween < 35) {
-            return <h6 style={{fontSize: "15px",
-                color: '#006400'}}> Close in 4 weeks </h6>
-        } if (daysBetween >= 35) {
-            return <h6 style={{fontSize: "15px",
-                color: '#006400'}}> Close in a month </h6>
+                color: '#006400'}}> Close in {daysBetween} days </h6>
         }
     }
 
@@ -204,11 +178,9 @@ const Auctions = () => {
                 <div style={{
                     width: "320px"}}>
                     <Stack direction="row" spacing={2} justifyContent="center">
-                        <Link to={"/auction/" + row.auctionId}>
-                            <Button variant="contained" endIcon={<ArticleIcon/>}>
-                              View
-                            </Button>
-                        </Link>
+                        <Button onClick={() => navigate("/auction/" + row.auctionId)}variant="contained" endIcon={<ArticleIcon/>}>
+                            View
+                        </Button>
                     </Stack>
                 </div>
             </Paper>
