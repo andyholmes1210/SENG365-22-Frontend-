@@ -23,17 +23,14 @@ const Navbar = () => {
                     </NavLink>
                 </NavMenu>
                 <NavBtn>
-<<<<<<< HEAD
                     <NavBtnLink to="/login">
                        Login
                     </NavBtnLink>
-=======
                     <Link to={"/login"}>
                         <Button variant="contained" endIcon={<LogoutIcon/>}>
                             Logout
                         </Button>
                     </Link>
->>>>>>> fe2c13612d12112ce0449ed3ae71b97987b73cb0
                 </NavBtn>
             </Nav>
         </>
