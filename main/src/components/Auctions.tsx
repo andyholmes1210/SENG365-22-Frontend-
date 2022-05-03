@@ -232,7 +232,9 @@ const Auctions = () => {
                 color: '#000000',
                 textShadow: "2px 2px #F0FFFF",
                 textDecorationLine: 'underline'}}>Auctions</h1>
-            <div style={{display: "inline-block",
+            <div style={{display: "flex",
+                flexFlow: "row wrap",
+                justifyContent: "center",
                 width: "1780px",
                 textAlign: "center"}}>
                 {errorFlag?

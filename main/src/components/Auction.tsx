@@ -25,44 +25,45 @@ const Auction = () => {
     const [errorMessage, setErrorMessage] = React.useState("")
     const [category, setCategory] = React.useState<Array<Category>>([])
     const [auction, setAuction] = React.useState<Array<Auctions>>([{auctionId: 0,
-        title: "",
-        description: "",
-        reserve: 0,
-        categoryId: 0,
-        sellerId: 0,
-        sellerFirstName: "",
-        sellerLastName: "",
-        highestBid: 0,
-        numBids: 0,
-        endDate: new Date(),
-        image_filename: ""}])
+                                                                            title: "",
+                                                                            description: "",
+                                                                            reserve: 0,
+                                                                            categoryId: 0,
+                                                                            sellerId: 0,
+                                                                            sellerFirstName: "",
+                                                                            sellerLastName: "",
+                                                                            highestBid: 0,
+                                                                            numBids: 0,
+                                                                            endDate: new Date(),
+                                                                            image_filename: ""}])
 
     const [bids, setBids] = React.useState<Array<Bid>>([{firstName: "firstName",
-        lastName: "lastName",
-        amount: 0,
-        id: 0,
-        timestamp: new Date(),
-        auction_id: 0,
-        user_id: 0,
-        bidderId: 0}])
-
+                                                                    lastName: "lastName",
+                                                                    amount: 0,
+                                                                    id: 0,
+                                                                    timestamp: new Date(),
+                                                                    auction_id: 0,
+                                                                    user_id: 0,
+                                                                    bidderId: 0}])
 
     const [dialogBidder, setDialogBidder] = React.useState<Bid>({firstName: "firstName",
-        lastName: "lastName",
-        amount: 0,
-        id: 0,
-        timestamp: new Date(),
-        auction_id: 0,
-        user_id: 0,
-        bidderId: 0})
+                                                                            lastName: "lastName",
+                                                                            amount: 0,
+                                                                            id: 0,
+                                                                            timestamp: new Date(),
+                                                                            auction_id: 0,
+                                                                            user_id: 0,
+                                                                            bidderId: 0})
+
     const [updateBidder, setUpdateBidder] = React.useState<Bid>({firstName: "firstName",
-        lastName: "lastName",
-        amount: 0,
-        id: 0,
-        timestamp: new Date(),
-        auction_id: 0,
-        user_id: 0,
-        bidderId: 0})
+                                                                            lastName: "lastName",
+                                                                            amount: 0,
+                                                                            id: 0,
+                                                                            timestamp: new Date(),
+                                                                            auction_id: 0,
+                                                                            user_id: 0,
+                                                                            bidderId: 0})
+
     let { id } = useParams();
 
     const handleBidderDialogOpen = (bids: Bid) => {
@@ -248,13 +249,21 @@ const Auction = () => {
                         </Button>
                     </Stack>
                 </div>
+
                 <div style={{float:"left",
                     width: "890px",
                     padding:"5px"}}>
                     <Stack direction="row" spacing={2} justifyContent="left">
-                        <Button variant="contained" endIcon={<AttachMoneyIcon/>} onClick={() => handleBidderDialogOpen(bids)}>
-                            View Bidders
-                        </Button>
+
+                        { auction.numBids > 0?
+                            <Button variant="contained" endIcon={<AttachMoneyIcon/>}
+                                    onClick={() => handleBidderDialogOpen(bids)}>
+                                View Bidders
+                            </Button>:
+                            <Button variant="contained" endIcon={<AttachMoneyIcon/>} disabled>
+                                View Bidders
+                            </Button>
+                        }
                         <Dialog
                             open={openBidderDialog}
                             onClose={handleBidderDialogClose}

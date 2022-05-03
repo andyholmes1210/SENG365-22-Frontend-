@@ -21,7 +21,7 @@ const Navbar = () => {
                 </NavMenu>
                 <NavBtn>
                     <NavBtnLink to="/login">
-                       Logout
+                       Login
                     </NavBtnLink>
                 </NavBtn>
             </Nav>
