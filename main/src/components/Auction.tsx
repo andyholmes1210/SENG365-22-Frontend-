@@ -1,4 +1,5 @@
 import {useNavigate, useParams} from "react-router-dom";
+import {BackBtn, BackBtnLink} from "./ButtonElement";
 import {
     Alert,
     AlertTitle,
@@ -10,10 +11,10 @@ import {
     Paper,
     Stack, TableBody, TableCell, TableHead, TableRow,
 } from "@mui/material";
+import {NavTop, NavBottom} from "./Navbar/NavbarElement";
 import React from "react";
 import CSS from "csstype";
 import axios from "axios";
-import ArrowCircleLeftOutlinedIcon from '@mui/icons-material/ArrowCircleLeftOutlined';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ArticleIcon from '@mui/icons-material/Article';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -25,9 +26,9 @@ const Auction = () => {
     let { id } = useParams();
     const navigate = useNavigate()
     const [errorFlag, setErrorFlag] = React.useState(false)
+    const [errorMessage, setErrorMessage] = React.useState("")
     const [openBidderDialog, setOpenBidderDialog] = React.useState(false)
     const [openSimilarAuctionDialog, setOpenSimilarAuctionDialog] = React.useState(false)
-    const [errorMessage, setErrorMessage] = React.useState("")
     const [category, setCategory] = React.useState<Array<Category>>([])
     const [highestBidderId, sethighestBidderId] = React.useState(0)
     const [highestFirstnameBidder, sethighestFirstnameBidder] = React.useState("")
@@ -312,36 +313,36 @@ const Auction = () => {
 
     const auction_detail_rows = (auction: any, bids: any, similarauction: any) => {
         return (
-            <Paper elevation={15} style={{
-                textAlign: "center",
-                width: "1780px",
-                borderRadius: "30px"}}>
-                <div style={{display:"inline-block",
-                    width: "1780px"}}>
-                    <h1 style={{fontSize: "48px",
+            <Paper elevation={24} style={cardDiv}>
+                <div style={{
+                    width: "100%",
+                    textAlign: "center",
+                    margin: "auto"}}>
+                    <h1 style={{
+                        fontSize: "48px",
                         fontWeight: 'bold'}}>{auction.title}</h1>
                 </div>
                 <div style={{
                     padding: "5px"}}>
                     <img style={{display:"inline-block",
-                        height: "600px",
-                        width: "800px",
+                        height: "50%",
+                        width: "50%",
                         borderRadius: "30px"}}
                          src={"http://localhost:4941/api/v1/auctions/" + auction.auctionId + "/image"} onError={getAuctionDefault}/>
                 </div>
                 <div style={{display:"inline-block",
-                    width: "890px"}}>
+                    width: "50%"}}>
                     <h1>{checkReserve(auction)}</h1>
                 </div>
                 <div style={{display:"inline-block",
-                    width: "890px"}}>
+                    width: "50%"}}>
                     <Button variant="contained" color="success" endIcon={<AttachMoneyIcon/>}>
                         Place Bid
                     </Button>
                 </div>
-                <div style={{float:"left",
+                <div style={{display:"inline-block",
                     padding:"5px",
-                    width: "1780px",
+                    width: "100%",
                     textAlign:"center"}}>
                     <h2 style={headingLeft}>Description:</h2>
                     <h2 style={{fontSize: "20px", textAlign:"left"}}>{auction.description}</h2>
@@ -352,7 +353,7 @@ const Auction = () => {
                     <img style={{
                         height: "100px", width: "150px"}} src={"http://localhost:4941/api/v1/users/" + auction.sellerId + "/image"} onError={getImageDefault}/>
                 </div>
-                <div style={halfCell}>
+                <div style={halfCell1}>
                     <h2 style={headingCen}>Current Bidder:</h2>
                     { highestFirstnameBidder !== "" && highestLastnameBidder !== ""?
                         <div>
@@ -388,7 +389,7 @@ const Auction = () => {
                     <h3> {changeDate(auction.endDate.toString())} </h3>
                 </div>
                 <div style={halfCell}>
-                    <Stack direction="row" spacing={2} justifyContent="right">
+                    <Stack direction="row" spacing={2} justifyContent="center">
                         { similarauction.length !== 1?
                             <Button variant="contained" endIcon={<ArticleIcon/>}
                                     onClick={() => handleSimilarAuctionOpen(similarauction)}>
@@ -423,7 +424,7 @@ const Auction = () => {
                                                 Reserve
                                             </TableCell>
                                             <TableCell style={headingCen}>
-                                                Enddate
+                                                End date
                                             </TableCell>
                                             <TableCell style={headingCen}>
                                                 View
@@ -442,7 +443,7 @@ const Auction = () => {
                     </Stack>
                 </div>
                 <div style={halfCell}>
-                    <Stack direction="row" spacing={2} justifyContent="left">
+                    <Stack direction="row" spacing={2} justifyContent="center">
                         { auction.numBids > 0?
                             <Button variant="contained" endIcon={<AttachMoneyIcon/>}
                                     onClick={() => handleBidderDialogOpen(bids)}>
@@ -497,27 +498,37 @@ const Auction = () => {
     }
 
     const oneThirdCell: CSS.Properties = {
-        float: "left",
-        width: "592px",
-        padding: "5px"
+        display:"inline-block",
+        width: "33%",
+        padding: "5px",
     }
 
     const buttonStyle: CSS.Properties = {
-        float:"left",
-        width: "1480px",
-        padding:"5px"
+        display:"inline-block",
+        width: "75%",
+        margin: "left",
+        padding:"5px",
     }
 
     const halfCell: CSS.Properties = {
-        float:"left",
-        width: "890px",
-        padding:"5px"
+        display:"inline-block",
+        width: "50%",
+        padding:"5px",
+        textAlign: "center"
+    }
+
+    const halfCell1: CSS.Properties = {
+        display:"inline-block",
+        width: "50%",
+        padding:"5px",
+        textAlign: "center"
     }
 
     const headingCen: CSS.Properties = {
         fontWeight: 'bold',
         textDecorationLine: 'underline',
-        textAlign:"center"
+        textAlign:"center",
+        fontSize: "12px"
     }
 
     const headingLeft: CSS.Properties = {
@@ -528,54 +539,74 @@ const Auction = () => {
 
     const card: CSS.Properties = {
         padding: "10px",
-        margin: "30px",
-        display: "inline-block",
-        width: "1800px",
-        backgroundColor: '#B5834A'
+        margin: "auto",
+        width: "65%",
+        backgroundColor: '#3E2C41',
+        borderRadius: "15px",
+        marginTop: "20px",
+        marginBottom: "20px"
     }
+
+    const cardDiv: CSS.Properties = {
+        padding: "10px",
+        margin: "auto",
+        textAlign: "center",
+        width: "100%",
+        backgroundColor: '#5C527F',
+        borderRadius: "15px",
+        marginBottom: "15px"
+    }
+
     return (
-        <Paper elevation={10} style={card}>
-            <div style={buttonStyle}>
-                <Stack direction="row" spacing={2} justifyContent="left">
-                    <Button onClick={() => navigate("/")} variant="contained" endIcon={<ArrowCircleLeftOutlinedIcon/>}>
-                        Go back
-                    </Button>
-                </Stack>
-            </div>
-            <div style={{display:"inline-block",
+        <div>
+            <NavTop/>
+            <div>
+                <Paper elevation={10} style={card}>
+                    <div style={buttonStyle}>
+                        <BackBtn>
+                            <BackBtnLink to={"/"}>
+                                Back to Auctions
+                            </BackBtnLink>
+                        </BackBtn>
+                    </div>
+                    <div style={{display:"inline-block",
                         padding: "5px"}}>
-                <Stack direction="row" spacing={2} justifyContent="right">
-                    <Button variant="contained" color="secondary" endIcon={<EditIcon/>}>
-                        Edit
-                    </Button>
-                </Stack>
-            </div>
-            <div style={{display:"inline-block",
+                        <Stack direction="row" spacing={2} justifyContent="right">
+                            <Button variant="contained" color="error" endIcon={<DeleteIcon/>}>
+                                Delete Auction
+                            </Button>
+                        </Stack>
+                    </div>
+                    <div style={{display:"inline-block",
                         padding: "5px"}}>
-                <Stack direction="row" spacing={2} justifyContent="right">
-                    <Button variant="contained" color="error" endIcon={<DeleteIcon/>}>
-                        Delete Auction
-                    </Button>
-                </Stack>
+                        <Stack direction="row" spacing={2} justifyContent="right">
+                            <Button variant="contained" color="secondary" endIcon={<EditIcon/>}>
+                                Edit
+                            </Button>
+                        </Stack>
+                    </div>
+                    <h1 style={{fontSize: "50px",
+                        textAlign: "center",
+                        fontWeight: 'bold',
+                        fontStyle: 'italic',
+                        color: '#fff',
+                        textShadow: "3px 3px #5C527F",
+                        textDecorationLine: 'underline'}}>Auction Details</h1>
+                    <div style={{
+                        margin: "auto",
+                        width: "90%"}}>
+                        {errorFlag?
+                            <Alert severity="error">
+                                <AlertTitle>Error</AlertTitle>
+                                {errorMessage}
+                            </Alert>
+                            :""}
+                        {auction_detail_rows(auction, bids, similarauction)}
+                    </div>
+                </Paper>
             </div>
-            <h1 style={{fontSize: "50px",
-                textAlign: "center",
-                fontWeight: 'bold',
-                fontStyle: 'italic',
-                color: '#0B2A55',
-                textShadow: "2px 2px #55360B",
-                textDecorationLine: 'underline'}}>Auction Details</h1>
-            <div style={{display:"inline-block",
-                width: "1780px"}}>
-                {errorFlag?
-                    <Alert severity="error">
-                        <AlertTitle>Error</AlertTitle>
-                        {errorMessage}
-                    </Alert>
-                    :""}
-                {auction_detail_rows(auction, bids, similarauction)}
-            </div>
-        </Paper>
+            <NavBottom/>
+        </div>
     )
 }
 export default Auction;

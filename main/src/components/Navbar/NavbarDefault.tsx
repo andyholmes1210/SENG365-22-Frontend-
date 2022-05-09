@@ -1,11 +1,15 @@
 import React from 'react'
-import {Nav, NavLink, NavMenu, NavBtn, Bars} from "./NavbarElement";
+import {Nav, NavLink, NavMenu, NavBtn, Bars, NavBtnLink} from "./NavbarElement";
+
 import {Button} from "@mui/material";
 import LogoutIcon from '@mui/icons-material/Logout';
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 
 const Navbar = () => {
+
+    const navigate = useNavigate()
+
     return (
         <>
             <Nav>
@@ -23,11 +27,10 @@ const Navbar = () => {
                     </NavLink>
                 </NavMenu>
                 <NavBtn>
-                    <Link to={"/login"}>
-                        <Button variant="contained" endIcon={<LogoutIcon/>}>
-                            Logout
-                        </Button>
-                    </Link>
+                        <NavBtnLink to='/login'>Login</NavBtnLink>
+                        {/*<Button variant="contained" endIcon={<LogoutIcon/>}>*/}
+                        {/*    Logout*/}
+                        {/*</Button>*/}
                 </NavBtn>
             </Nav>
         </>
