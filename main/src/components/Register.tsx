@@ -5,7 +5,7 @@ const Login = () => {
         <div>
             <h1>Not Found</h1>
             <Link to={"/"}>Go to auctions</Link>
-            <Link to={"/register"}>Go to register</Link>
+            <Link to={"/login"}>Go to login</Link>
         </div>
     )
 }

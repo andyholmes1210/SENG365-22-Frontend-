@@ -5,17 +5,19 @@ import Auctions from "./components/Auctions";
 import Login from "./components/Login";
 import Auction from "./components/Auction";
 import Navbar from "./components/Navbar/NavbarDefault";
+import Register from "./components/Register";
 function App() {
   return (
       <div className="App" style={{
-          backgroundColor: "#5F9EA0"}}>
+          backgroundColor: "#4A7CB5"}}>
         <Router>
-            <Navbar />
+            <Navbar/>
           <div>
             <Routes>
                 <Route path="/" element={<Auctions/>}/>
                 <Route path="/auction/:id" element={<Auction/>}/>
                 <Route path="/login" element={<Login/>}/>
+                <Route path="/register" element={<Register/>}/>
             </Routes>
           </div>
         </Router>

@@ -1,4 +1,4 @@
-import {Link, useNavigate, useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {
     Alert,
     AlertTitle,
@@ -16,18 +16,34 @@ import axios from "axios";
 import ArrowCircleLeftOutlinedIcon from '@mui/icons-material/ArrowCircleLeftOutlined';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ArticleIcon from '@mui/icons-material/Article';
-import Navbar from "./Navbar/NavbarDefault";
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import Auctions from "./Auctions";
 
 
 const Auction = () => {
     let { id } = useParams();
+    const navigate = useNavigate()
     const [errorFlag, setErrorFlag] = React.useState(false)
     const [openBidderDialog, setOpenBidderDialog] = React.useState(false)
+    const [openSimilarAuctionDialog, setOpenSimilarAuctionDialog] = React.useState(false)
     const [errorMessage, setErrorMessage] = React.useState("")
     const [category, setCategory] = React.useState<Array<Category>>([])
-    // const [cateid, setCateId] = React.useState(0)
-    const [similarauction, setSimilarAuction] = React.useState<Array<Auctions>>([])
-    const navigate = useNavigate()
+    const [highestBidderId, sethighestBidderId] = React.useState(0)
+    const [highestFirstnameBidder, sethighestFirstnameBidder] = React.useState("")
+    const [highestLastnameBidder, sethighestLastnameBidder] = React.useState("")
+    const [similarauction, setSimilarAuction] = React.useState<Array<any>>([{auctionId: 0,
+                                                                                            title: "",
+                                                                                            description: "",
+                                                                                            reserve: 0,
+                                                                                            categoryId: 0,
+                                                                                            sellerId: 0,
+                                                                                            sellerFirstName: "",
+                                                                                            sellerLastName: "",
+                                                                                            highestBid: 0,
+                                                                                            numBids: 0,
+                                                                                            endDate: new Date(),
+                                                                                            image_filename: ""}])
     const [auction, setAuction] = React.useState<Auctions>({auctionId: 0,
                                                                             title: "",
                                                                             description: "",
@@ -42,13 +58,13 @@ const Auction = () => {
                                                                             image_filename: ""})
 
     const [bids, setBids] = React.useState<Array<Bid>>([{firstName: "firstName",
-                                                                    lastName: "lastName",
-                                                                    amount: 0,
-                                                                    id: 0,
-                                                                    timestamp: new Date(),
-                                                                    auction_id: 0,
-                                                                    user_id: 0,
-                                                                    bidderId: 0}])
+                                                                        lastName: "lastName",
+                                                                        amount: 0,
+                                                                        id: 0,
+                                                                        timestamp: new Date(),
+                                                                        auction_id: 0,
+                                                                        user_id: 0,
+                                                                        bidderId: 0}])
 
     const [dialogBidder, setDialogBidder] = React.useState<Bid>({firstName: "firstName",
                                                                             lastName: "lastName",
@@ -84,23 +100,59 @@ const Auction = () => {
         setOpenBidderDialog(false);
     };
 
-    // const [dialogSimilarAuction, setdialogSimilarAuction] = React.useState<Array<Auctions>>([])
-    // const [updateSimilarAuction, setupdateSimilarAuction] = React.useState<Array<Auctions>>([])
-    //
-    // const handleSimilarAuctionOpen = () => {
-    //
-    // }
-    //
-    // const handleSimilarAuctionClose = () => {
-    //
-    // }
+    const [dialogSimilarAuction, setdialogSimilarAuction] = React.useState<Auctions>({auctionId: 0,
+                                                                                                        title: "",
+                                                                                                        description: "",
+                                                                                                        reserve: 0,
+                                                                                                        categoryId: 0,
+                                                                                                        sellerId: 0,
+                                                                                                        sellerFirstName: "",
+                                                                                                        sellerLastName: "",
+                                                                                                        highestBid: 0,
+                                                                                                        numBids: 0,
+                                                                                                        endDate: new Date(),
+                                                                                                        image_filename: ""})
+
+    const [updateSimilarAuction, setupdateSimilarAuction] = React.useState<Auctions>({auctionId: 0,
+                                                                                                        title: "",
+                                                                                                        description: "",
+                                                                                                        reserve: 0,
+                                                                                                        categoryId: 0,
+                                                                                                        sellerId: 0,
+                                                                                                        sellerFirstName: "",
+                                                                                                        sellerLastName: "",
+                                                                                                        highestBid: 0,
+                                                                                                        numBids: 0,
+                                                                                                        endDate: new Date(),
+                                                                                                        image_filename: ""})
+
+    const handleSimilarAuctionOpen = (similarauction: Auctions) => {
+        setdialogSimilarAuction(similarauction)
+        setOpenSimilarAuctionDialog(true)
+    }
+
+    const handleSimilarAuctionClose = () => {
+        setupdateSimilarAuction({auctionId: 0,
+            title: "",
+            description: "",
+            reserve: 0,
+            categoryId: 0,
+            sellerId: 0,
+            sellerFirstName: "",
+            sellerLastName: "",
+            highestBid: 0,
+            numBids: 0,
+            endDate: new Date(),
+            image_filename: ""})
+        setOpenSimilarAuctionDialog(false);
+    }
 
 
     React.useEffect(() => {
         getOneAuction()
-        getAuctionBid()
         getCategory()
-    },[])
+        getAuctionBid()
+    },[highestBidderId, highestFirstnameBidder, highestLastnameBidder, id])
 
     const getOneAuction = () => {
         axios.get('http://localhost:4941/api/v1/auctions/' + id)
@@ -121,6 +173,9 @@ const Auction = () => {
                 setErrorFlag(false)
                 setErrorMessage("")
                 setBids(response.data)
+                sethighestBidderId(response.data[0].bidderId)
+                sethighestFirstnameBidder(response.data[0].firstName)
+                sethighestLastnameBidder(response.data[0].lastName)
             }, (error) => {
                 setErrorFlag(true)
                 setErrorMessage(error.toString())
@@ -132,7 +187,7 @@ const Auction = () => {
             .then((response) => {
                 setErrorFlag(false)
                 setErrorMessage("")
-                setSimilarAuction(response.data.auction)
+                setSimilarAuction(response.data.auctions)
             }, (error) => {
                 setErrorFlag(true)
                 setErrorMessage(error.toString())
@@ -173,16 +228,69 @@ const Auction = () => {
         }
     }
 
-    // const get_similarauctions_rows = () => {
-    //     return (similarauction.map((row) =>
-    //             <TableRow hover
-    //                       tabIndex={-1}>
-    //                 <TableCell>Test</TableCell>
-    //
-    //             </TableRow>
-    //         )
-    //     )
-    // }
+    const checkDate = (x: any) => {
+        const daysBetween: number = (Math.trunc((new Date(x).getTime() - new Date().getTime())/(86400 * 1000)))
+        if (daysBetween < 0) {
+            return <h6 style={{fontSize: "12px",
+                color: '#58111A'}}> Auction End </h6>
+        } if (daysBetween === 0) {
+            return <h6 style={{fontSize: "12px",
+                color: '#FF0800'}}> Close Today </h6>
+        } if (daysBetween === 1) {
+            return <h6 style={{fontSize: "12px",
+                color: '#CD5700'}}> Close Tomorrow </h6>
+        } if (daysBetween > 1 && daysBetween < 14) {
+            return <h6 style={{fontSize: "12px",
+                color: '#FEBE10'}}> Close in {daysBetween} days </h6>
+        } if (daysBetween >= 14) {
+            return <h6 style={{fontSize: "12px",
+                color: '#006400'}}> Close in {daysBetween} days </h6>
+        }
+    }
+
+    const checkReserve = (x: any) => {
+        if(x.highestBid >= x.reserve) {
+            return <h6 style={{fontSize: "25px",
+                textAlign: "center",
+                fontStyle: 'italic',
+                color: 'green'}}>Reserved Met</h6>
+        } else {
+            return <h6 style={{fontSize: "25px",
+                textAlign: "center",
+                fontStyle: 'italic',
+                color: 'red'}}>Reserved Not Met</h6>
+        }
+    }
+
+    const getImageDefault = (event: any) => {
+        event.target.src = "https://icon-library.com/images/default-profile-icon/default-profile-icon-24.jpg"
+    }
+
+    const getAuctionDefault = (event: any) => {
+        event.target.src = "https://atasouthport.com/wp-content/uploads/2017/04/default-image.jpg"
+    }
+
+    const get_similarauctions_rows = () => {
+        return (similarauction.filter(similarauction => similarauction.auctionId !== auction.auctionId).map((row) =>
+                <TableRow hover
+                          tabIndex={-1}>
+                    <TableCell><img style={{
+                        height: "55px", width: "70px"}} src={"http://localhost:4941/api/v1/auctions/" + row.auctionId + "/image"}
+                                    onError={getAuctionDefault}/>
+                    </TableCell>
+                    <TableCell style={{fontSize: "12px"}}>{row.title}</TableCell>
+                    <TableCell style={{fontSize: "12px"}}>${checkNull(row.highestBid)}</TableCell>
+                    <TableCell style={{fontSize: "12px"}}>${row.reserve}</TableCell>
+                    <TableCell>{checkDate(row.endDate.toString())}</TableCell>
+                    <TableCell>
+                        <Button onClick={() => {handleSimilarAuctionClose(); navigate("/auction/" + row.auctionId)}} variant="contained" endIcon={<ArticleIcon/>}>
+                            View
+                        </Button>
+                    </TableCell>
+                </TableRow>
+            )
+        )
+    }
 
     const get_bidders_rows = () => {
         return (bids.map((row) =>
@@ -194,29 +302,42 @@ const Auction = () => {
                     <TableCell>{changeDate(row.timestamp.toString())}</TableCell>
                     <TableCell>
                         <img style={{
-                            height: "100px", width: "100px"}} src={"http://localhost:4941/api/v1/users/" + row.bidderId + "/image"}/>
+                            height: "100px", width: "100px"}} src={"http://localhost:4941/api/v1/users/" + row.bidderId + "/image"}
+                             onError={getImageDefault}/>
                     </TableCell>
                 </TableRow>
             )
         )
     }
 
-    const auction_detail_rows = (auction: any, bids: any) => {
+    const auction_detail_rows = (auction: any, bids: any, similarauction: any) => {
         return (
             <Paper elevation={15} style={{
                 textAlign: "center",
-                width: "1780px"}}>
-                <div style={{
-                    padding: "5px"}}>
-                    <img style={{display:"inline-block",
-                        height: "600px",
-                        width: "800px"}}
-                         src={"http://localhost:4941/api/v1/auctions/" + auction.auctionId + "/image"}/>
-                </div>
+                width: "1780px",
+                borderRadius: "30px"}}>
                 <div style={{display:"inline-block",
                     width: "1780px"}}>
                     <h1 style={{fontSize: "48px",
                         fontWeight: 'bold'}}>{auction.title}</h1>
+                </div>
+                <div style={{
+                    padding: "5px"}}>
+                    <img style={{display:"inline-block",
+                        height: "600px",
+                        width: "800px",
+                        borderRadius: "30px"}}
+                         src={"http://localhost:4941/api/v1/auctions/" + auction.auctionId + "/image"} onError={getAuctionDefault}/>
+                </div>
+                <div style={{display:"inline-block",
+                    width: "890px"}}>
+                    <h1>{checkReserve(auction)}</h1>
+                </div>
+                <div style={{display:"inline-block",
+                    width: "890px"}}>
+                    <Button variant="contained" color="success" endIcon={<AttachMoneyIcon/>}>
+                        Place Bid
+                    </Button>
                 </div>
                 <div style={{float:"left",
                     padding:"5px",
@@ -229,16 +350,22 @@ const Auction = () => {
                     <h2 style={headingCen}>Seller:</h2>
                     <h3> {auction.sellerFirstName} {auction.sellerLastName} </h3>
                     <img style={{
-                        height: "100px", width: "150px"}} src={"http://localhost:4941/api/v1/users/" + auction.sellerId + "/image"}/>
+                        height: "100px", width: "150px"}} src={"http://localhost:4941/api/v1/users/" + auction.sellerId + "/image"} onError={getImageDefault}/>
                 </div>
                 <div style={halfCell}>
                     <h2 style={headingCen}>Current Bidder:</h2>
-                    <h3> {auction.sellerFirstName} {auction.sellerLastName} </h3>
-                    <img style={{
-                        height: "100px", width: "150px"}} src={"http://localhost:4941/api/v1/users/" + auction.sellerId + "/image"}/>
-                    {/*<h3> {bids.firstName} {bids.lastName} </h3>*/}
-                    {/*<img style={{*/}
-                    {/*    height: "100px", width: "150px"}} src={"http://localhost:4941/api/v1/users/" + bids.bidderId + "/image"}/>*/}
+                    { highestFirstnameBidder !== "" && highestLastnameBidder !== ""?
+                        <div>
+                            <h3> {highestFirstnameBidder} {highestLastnameBidder} </h3>
+                            <img style={{height: "100px", width: "150px"}} src={"http://localhost:4941/api/v1/users/" + highestBidderId + "/image"}
+                             onError={getImageDefault}/>
+                        </div>:
+                        <div>
+                            <h3> No Top Bidder </h3>
+                            <img style={{height: "100px", width: "150px"}} src={"http://localhost:4941/api/v1/users/" + highestBidderId + "/image"}
+                            onError={getImageDefault}/>
+                        </div>
+                    }
                 </div>
                 <div style={oneThirdCell}>
                     <h2 style={headingCen}>Number of Bids:</h2>
@@ -262,15 +389,60 @@ const Auction = () => {
                 </div>
                 <div style={halfCell}>
                     <Stack direction="row" spacing={2} justifyContent="right">
-                        <Button variant="contained" endIcon={<ArticleIcon/>}>
-                            View Similar Auctions
-                        </Button>
+                        { similarauction.length !== 1?
+                            <Button variant="contained" endIcon={<ArticleIcon/>}
+                                    onClick={() => handleSimilarAuctionOpen(similarauction)}>
+                                View Similar Auctions
+                            </Button>:
+                            <Button variant="contained" endIcon={<ArticleIcon/>} disabled>
+                                View Similar Auctions
+                            </Button>
+                        }
+                        <Dialog
+                            open={openSimilarAuctionDialog}
+                            onClose={handleSimilarAuctionClose}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description">
+                            <DialogTitle id="alert-dialog-title">
+                                {"Similar Auctions"}
+                            </DialogTitle>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell style={headingCen}>
+                                                Photo
+                                            </TableCell>
+                                            <TableCell style={headingCen}>
+                                                Title
+                                            </TableCell>
+                                            <TableCell style={headingCen}>
+                                                Bid
+                                            </TableCell>
+                                            <TableCell style={headingCen}>
+                                                Reserve
+                                            </TableCell>
+                                            <TableCell style={headingCen}>
+                                                Enddate
+                                            </TableCell>
+                                            <TableCell style={headingCen}>
+                                                View
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {get_similarauctions_rows()}
+                                    </TableBody>
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleSimilarAuctionClose}>Close</Button>
+                            </DialogActions>
+                        </Dialog>
                     </Stack>
                 </div>
-
                 <div style={halfCell}>
                     <Stack direction="row" spacing={2} justifyContent="left">
-
                         { auction.numBids > 0?
                             <Button variant="contained" endIcon={<AttachMoneyIcon/>}
                                     onClick={() => handleBidderDialogOpen(bids)}>
@@ -330,6 +502,12 @@ const Auction = () => {
         padding: "5px"
     }
 
+    const buttonStyle: CSS.Properties = {
+        float:"left",
+        width: "1480px",
+        padding:"5px"
+    }
+
     const halfCell: CSS.Properties = {
         float:"left",
         width: "890px",
@@ -353,21 +531,39 @@ const Auction = () => {
         margin: "30px",
         display: "inline-block",
         width: "1800px",
-        backgroundColor: '#008B8B'
+        backgroundColor: '#B5834A'
     }
     return (
         <Paper elevation={10} style={card}>
-            <Stack direction="row" spacing={2} justifyContent="left">
-                <Button onClick={() => navigate("/")} variant="contained" endIcon={<ArrowCircleLeftOutlinedIcon/>}>
-                    Go back
-                </Button>
-            </Stack>
+            <div style={buttonStyle}>
+                <Stack direction="row" spacing={2} justifyContent="left">
+                    <Button onClick={() => navigate("/")} variant="contained" endIcon={<ArrowCircleLeftOutlinedIcon/>}>
+                        Go back
+                    </Button>
+                </Stack>
+            </div>
+            <div style={{display:"inline-block",
+                        padding: "5px"}}>
+                <Stack direction="row" spacing={2} justifyContent="right">
+                    <Button variant="contained" color="secondary" endIcon={<EditIcon/>}>
+                        Edit
+                    </Button>
+                </Stack>
+            </div>
+            <div style={{display:"inline-block",
+                        padding: "5px"}}>
+                <Stack direction="row" spacing={2} justifyContent="right">
+                    <Button variant="contained" color="error" endIcon={<DeleteIcon/>}>
+                        Delete Auction
+                    </Button>
+                </Stack>
+            </div>
             <h1 style={{fontSize: "50px",
                 textAlign: "center",
                 fontWeight: 'bold',
                 fontStyle: 'italic',
-                color: '#000000',
-                textShadow: "2px 2px #F0FFFF",
+                color: '#0B2A55',
+                textShadow: "2px 2px #55360B",
                 textDecorationLine: 'underline'}}>Auction Details</h1>
             <div style={{display:"inline-block",
                 width: "1780px"}}>
@@ -377,7 +573,7 @@ const Auction = () => {
                         {errorMessage}
                     </Alert>
                     :""}
-                {auction_detail_rows(auction, bids)}
+                {auction_detail_rows(auction, bids, similarauction)}
             </div>
         </Paper>
     )

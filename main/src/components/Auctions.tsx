@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import {Link, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import CSS from 'csstype';
 import ArticleIcon from '@mui/icons-material/Article';
 
@@ -61,18 +61,6 @@ const Auctions = () => {
             })
     }
 
-    const getAuctionImage = (x: any) => {
-        axios.get('http://localhost:4941/api/v1/auctions/' + x.sellerId + "/image")
-            .then((response) => {
-                setErrorFlag(false)
-                setErrorMessage("")
-                setImage(response.data)
-            }, (error) => {
-                setErrorFlag(true)
-                setErrorMessage(error.toString())
-            })
-    }
-
     const checkNull = (x: any) => {
         if(x === null){
             return 0
@@ -115,13 +103,13 @@ const Auctions = () => {
         }
     }
 
-    // const checkImage = (x: any) => {
-    //     if(image === null){
-    //         return <img style={{height: "30px", width: "30px"}} src={"https://minervastrategies.com/wp-content/uploads/2016/03/default-avatar.jpg"}/>
-    //     } else {
-    //         return <img style={{height: "30px", width: "30px"}} src={"http://localhost:4941/api/v1/users/" + x.sellerId + "/image"}/>
-    //     }
-    // }
+    const getImageDefault = (event: any) => {
+        event.target.src = "https://icon-library.com/images/default-profile-icon/default-profile-icon-24.jpg"
+    }
+
+    const getAuctionDefault = (event: any) => {
+        event.target.src = "https://atasouthport.com/wp-content/uploads/2017/04/default-image.jpg"
+    }
 
     const auction_rows = () => {
         return (auctions.map((row) =>
@@ -132,13 +120,16 @@ const Auctions = () => {
                 margin: "55px",
                 padding: "5px",
                 textAlign: "center",
-             alignContent: "center"}}>
+                alignContent: "center",
+                borderRadius: "30px"}}>
                 <div style={{
                     padding: "5px"}}>
                     <img style={{
                         height: "120px",
-                        width: "180px",}}
-                    src={"http://localhost:4941/api/v1/auctions/" + row.auctionId + "/image"}/>
+                        width: "180px",
+                        borderRadius: "15px"}}
+                    src={"http://localhost:4941/api/v1/auctions/" + row.auctionId + "/image"}
+                    onError={getAuctionDefault}/>
                 </div>
                 <div style={{display:"inline-block",
                     width: "320px"}}>
@@ -161,7 +152,7 @@ const Auctions = () => {
                     <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline'}}> Seller:</h6>
                     <h6 style={{fontSize: "15px"}}>
                         {row.sellerFirstName} {row.sellerLastName} <img style={{
-                            height: "30px", width: "30px"}} src={"http://localhost:4941/api/v1/users/" + row.sellerId + "/image"}/>
+                            height: "30px", width: "30px"}} src={"http://localhost:4941/api/v1/users/" + row.sellerId + "/image"} onError={getImageDefault}/>
                     </h6>
                 </div>
                 <div style={{float:"left",
@@ -193,7 +184,8 @@ const Auctions = () => {
         margin: "30px",
         display: "inline-block",
         width: "1800px",
-        backgroundColor: '#008B8B'
+        backgroundColor: '#B5834A',
+        borderRadius: "15px"
     }
 
     return (
@@ -202,8 +194,8 @@ const Auctions = () => {
                 textAlign: "center",
                 fontWeight: 'bold',
                 fontStyle: 'italic',
-                color: '#000000',
-                textShadow: "2px 2px #F0FFFF",
+                color: '#0B2A55',
+                textShadow: "2px 2px #55360B",
                 textDecorationLine: 'underline'}}>Auctions</h1>
             <div style={{display: "flex",
                 flexFlow: "row wrap",
@@ -225,7 +217,7 @@ const Auctions = () => {
             <div style={{width: "1800px",
                 display:"flex",
                 justifyContent:"center"}}>
-                <Pagination count={totalpage} variant="outlined" shape="rounded" size="large" onChange={paginationPage}/>
+                <Pagination count={totalpage} size="large" onChange={paginationPage}/>
             </div>
         </Paper>
     )

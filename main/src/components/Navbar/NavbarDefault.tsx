@@ -1,5 +1,5 @@
 import React from 'react'
-import {Nav, NavLink, NavMenu, NavBtn, NavBtnLink, Bars} from "./NavbarElement";
+import {Nav, NavLink, NavMenu, NavBtn, Bars} from "./NavbarElement";
 import {Button} from "@mui/material";
 import LogoutIcon from '@mui/icons-material/Logout';
 import {Link} from "react-router-dom";
@@ -11,13 +11,13 @@ const Navbar = () => {
             <Nav>
                 <NavLink to="/">
                     <img style={{ height: "70px",
-                        width: "70px"}} src={require('../../telegram-logo-947.png')} alt={'Logo'} />
+                        width: "70px"}} src={require('../../clipart1139281.png')} alt={'Logo'} />
                 </NavLink>
                 <Bars />
-                <NavLink to="/">
-                    Home
-                </NavLink>
                 <NavMenu>
+                    <NavLink to="/">
+                        Home
+                    </NavLink>
                     <NavLink to="/profile">
                         Profile
                     </NavLink>
