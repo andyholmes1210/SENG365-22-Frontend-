@@ -25,8 +25,7 @@ const Auctions = () => {
     const [errorMessage, setErrorMessage] = React.useState("")
     const [auctions, setAuctions] = React.useState<Array<Auctions>>([])
     const [category, setCategory] = React.useState<Array<Category>>([])
-    const [image, setImage] = React.useState<Array<Auctions>>([])
-    const [count, setCount] = React.useState(10)
+    const [count] = React.useState(10)
     const [index, setIndex] = React.useState(0)
     const [totalpage, setTotalpage] = React.useState(0)
 
@@ -146,37 +145,37 @@ const Auctions = () => {
                     </div>
                     <div style={{display:"inline-block",
                         width: "300px"}}>
-                        <h1 style={{fontSize: "24px"}}>{row.title}</h1>
+                        <h1 style={{fontSize: "24px", color: '#fff'}}>{row.title}</h1>
                     </div>
                     <div style={{float:"left",
                         width: "150px"}}>
-                        <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline'}}> End Date:</h6>
+                        <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline', color: '#fff'}}> End Date:</h6>
                         {checkDate(row.endDate.toString())}
                     </div>
                     <div style={{display:"inline-block",
                         width: "150px"}}>
-                        <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline'}}> Category: </h6>
-                        <h6 style={{fontSize: "15px"}}> {category.filter(function checkCategory(x:any) {
+                        <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline', color: '#fff'}}> Category: </h6>
+                        <h6 style={{fontSize: "15px", color: '#fff'}}> {category.filter(function checkCategory(x:any) {
                             return x.categoryId === row.categoryId
                         }).map((x) => x.name)} </h6>
                     </div>
                     <div style={{
                         width: "300px"}}>
-                        <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline'}}> Seller:</h6>
-                        <h6 style={{fontSize: "15px"}}>
+                        <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline', color: '#fff'}}> Seller:</h6>
+                        <h6 style={{fontSize: "15px", color: '#fff'}}>
                             {row.sellerFirstName} {row.sellerLastName} <img style={{
                             height: "30px", width: "30px"}} src={"http://localhost:4941/api/v1/users/" + row.sellerId + "/image"} onError={getImageDefault}/>
                         </h6>
                     </div>
                     <div style={{float:"left",
                         width: "150px"}}>
-                        <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline'}}> Highest bid:</h6>
-                        <h6 style={{fontSize: "15px"}}>${checkNull(row.highestBid)}</h6>
+                        <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline', color: '#fff'}}> Highest bid:</h6>
+                        <h6 style={{fontSize: "15px", color: '#fff'}}>${checkNull(row.highestBid)}</h6>
                     </div>
                     <div style={{display:"inline-block",
                         width: "150px"}}>
-                        <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline'}}> Reserve Price:</h6>
-                        <h6 style={{fontSize: "15px"}}>${row.reserve}</h6>
+                        <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline', color: '#fff'}}> Reserve Price:</h6>
+                        <h6 style={{fontSize: "15px", color: '#fff'}}>${row.reserve}</h6>
                         {checkReserve(row)}
                     </div>
                     <div>
@@ -195,8 +194,8 @@ const Auctions = () => {
     const card: CSS.Properties = {
         padding: "10px",
         margin: "auto",
-        marginTop: "50px",
-        marginBottom: "50px",
+        marginTop: "5%",
+        marginBottom: "5%",
         width: "80%",
         backgroundColor: '#261C2C',
         borderRadius: "15px"
@@ -237,13 +236,20 @@ const Auctions = () => {
                         justifyContent: "center",
                         width: "80%",
                         margin: "auto",
-                        textAlign: "center"}}>
+                        textAlign: "center",
+                        marginBottom: "10px"}}>
                         {errorFlag?
-                            <Alert severity="error">
-                                <AlertTitle>Error</AlertTitle>
+                            <Alert severity="error" variant="filled" >
                                 {errorMessage}
                             </Alert>
                             :""}
+                    </div>
+                    <div style={{display: "flex",
+                        flexFlow: "row wrap",
+                        justifyContent: "center",
+                        width: "80%",
+                        margin: "auto",
+                        textAlign: "center"}}>
                         {auction_rows()}
                     </div>
                     <div style={{width: "80%",

@@ -2,15 +2,15 @@ import {Link, useNavigate} from "react-router-dom";
 import CSS from "csstype";
 import {
     Alert,
-    AlertTitle,
+    AlertTitle, Button,
     FormControl,
     Input,
     InputAdornment,
     InputLabel,
-    Paper,
+    Paper, Stack,
     TextField
 } from "@mui/material";
-import {RegisterBtnLink, RegisterBtn} from "./ButtonElement";
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import React from "react";
 import IconButton from '@mui/material/IconButton';
 import {Visibility, VisibilityOff} from "@mui/icons-material";
@@ -31,10 +31,15 @@ const Register = () => {
     const [firstname, setFirstName] = React.useState("")
     const [lastname, setLastName] = React.useState("")
     const [email, setEmail] = React.useState("")
+    const [emailerror, setEmailError] = React.useState(false)
+    const [emailhelpertext, setEmailHelperText] = React.useState("")
+
+
     const [password, setPassword] = React.useState<State>({
         password: '',
         showPassword: false,
     });
+    const [image, setImage] = React.useState("")
 
     const handleChange =
         (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,12 +53,24 @@ const Register = () => {
         });
     };
 
+    React.useEffect(() => {
+
+    },[image])
+
+
     const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
     };
 
     const updateEmailState = (event: any) => {
-        setEmail(event.target.value)
+        if (event.target.value.match("^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+")) {
+            setEmailError(false);
+            setEmailHelperText("");
+            setEmail(event.target.value);
+        } else {
+            setEmailError(true);
+            setEmailHelperText("Please enter a valid email");
+        }
     }
 
     const updateFirstNameState = (event: any) => {
@@ -64,9 +81,24 @@ const Register = () => {
         setLastName(event.target.value)
     }
 
+
+    // const uploadProfilePic = () => {
+    //     axios.put('http://localhost:4941/api/v1/users/' + localStorage.getItem("userId") + '/image', image.value, {headers:
+    //             {'X-Authorization' : localStorage.getItem("auth_token")!}})
+    //             .then((response) => {
+    //             }, (error) => {
+    //             setErrorFlag(true)
+    //             setErrorMessage(error.toString())
+    //         })
+    // }
+
     const registerUser = () => {
-        if (firstname === "" || lastname === "") {
-            alert("Please enter all the fields")
+        if (firstname === "" || lastname === "" || email === "" || password.password === "") {
+            setErrorMessage("Please enter all the fields!")
+            setErrorFlag(true)
+        } else if (password.password.length < 6) {
+            setErrorMessage("Password much be at least 6 characters in length!")
+            setErrorFlag(true)
         } else {
             axios.post('http://localhost:4941/api/v1/users/register', {
                 "firstName": firstname,
@@ -81,19 +113,30 @@ const Register = () => {
                     })
                         .then((response) => {
                             localStorage.setItem("auth_token", response.data.token)
-                            localStorage.setItem("logged_id", response.data.user_id)
+                            localStorage.setItem("userId", response.data.userId)
                             navigate("/")
                         }, (error) => {
                             setErrorFlag(true)
                             setErrorMessage(error.toString())
                         })
                 })
+                .catch((error) => {
+                    setErrorMessage("Email already in used, please try again")
+                    // setErrorMessage(error.response.statusText)
+                    setErrorFlag(true)
+                })
         }
     }
 
     const register_rows = () => {
+        console.log(image)
         return (
             <Paper elevation={10} style={cardDiv}>
+                <div style={textBox}>
+                    <h5>Select a profile picture (optional):</h5>
+                    <input type="file" accept="image/png, image/jpeg, image/gif"/>
+                </div>
+
                 <div style={textBox}>
                     <TextField fullWidth id="standard-basic" label="First Name" value={firstname} variant="standard" onChange={updateFirstNameState}/>
                 </div>
@@ -101,7 +144,7 @@ const Register = () => {
                     <TextField fullWidth id="standard-basic" label="Last Name" value={lastname} variant="standard" onChange={updateLastNameState}/>
                 </div>
                 <div style={textBox}>
-                    <TextField fullWidth id="standard-basic" label="Email address" value={email} variant="standard" onChange={updateEmailState}/>
+                    <TextField fullWidth id="standard-basic" label="Email address" helperText={emailhelpertext} error={emailerror} variant="standard" onChange={updateEmailState}/>
                 </div>
                 <div style={textBox}>
                     <FormControl variant="standard">
@@ -128,9 +171,11 @@ const Register = () => {
                     Already have an Account? <Link to="/login">Sign In</Link>
                 </div>
                 <div>
-                    <RegisterBtn>
-                        <RegisterBtnLink to="/">Register</RegisterBtnLink>
-                    </RegisterBtn>
+                    <Stack direction="row" spacing={2} justifyContent="center">
+                        <Button variant="contained" endIcon={<AssignmentIcon/>} onClick={() => registerUser()}>
+                            Sign Up
+                        </Button>
+                    </Stack>
                 </div>
             </Paper>
         )
@@ -169,7 +214,6 @@ const Register = () => {
         marginBottom: "20px",
         borderRadius: "15px"
     }
-
     return (
         <div>
             <Navbar/>
@@ -183,13 +227,15 @@ const Register = () => {
                         textShadow: "3px 3px #5C527F",
                         textDecorationLine: 'underline'}}>Register</h1>
                     <div style={{display:"inline-block",
-                        width: "100%"}}>
+                        width: "100%",
+                        marginBottom: "10px"}}>
                         {errorFlag?
-                            <Alert severity="error">
-                                <AlertTitle>Error</AlertTitle>
-                                {errorMessage}
+                            <Alert severity="error" variant="filled" >
+                                <strong>{errorMessage}</strong>
                             </Alert>
                             :""}
+                    </div>
+                    <div>
                         {register_rows()}
                     </div>
                 </Paper>

@@ -2,17 +2,17 @@ import {Link, useNavigate} from "react-router-dom";
 import CSS from "csstype";
 import {
     Alert,
-    AlertTitle,
+    Button,
     FormControl,
     Input,
     InputAdornment,
     InputLabel,
-    Paper,
+    Paper, Snackbar, Stack,
     TextField
 } from "@mui/material";
-import {LoginBtnLink, LoginBtn} from "./ButtonElement";
 import React from "react";
 import axios from "axios";
+import LoginIcon from '@mui/icons-material/Login';
 import IconButton from '@mui/material/IconButton';
 import {Visibility, VisibilityOff} from "@mui/icons-material";
 import Navbar from "./Navbar/NavbarDefault";
@@ -25,7 +25,6 @@ const Login = () => {
     }
 
     const navigate = useNavigate()
-
     const [errorFlag, setErrorFlag] = React.useState(false)
     const [errorMessage, setErrorMessage] = React.useState("")
     const [email, setEmail] = React.useState("")
@@ -55,11 +54,9 @@ const Login = () => {
     }
 
     const loginUser = () => {
-        if (password.password.length < 6) {
-            alert("Password much be at least 6 characters in length.")
-        }
         if (email === "" || password.password === "") {
-            alert("Please enter a username!")
+            setErrorMessage("Please enter all the fields!")
+            setErrorFlag(true)
         } else {
             axios.post('http://localhost:4941/api/v1/users/login', {
                 "email": email,
@@ -67,11 +64,11 @@ const Login = () => {
             })
                 .then((response) => {
                     localStorage.setItem("auth_token", response.data.token)
-                    localStorage.setItem("logged_id", response.data.user_id)
+                    localStorage.setItem("userId", response.data.userId)
                     navigate("/")
                 }, (error) => {
+                    setErrorMessage(error.response.statusText)
                     setErrorFlag(true)
-                    setErrorMessage(error.toString())
                 })
         }
     }
@@ -108,9 +105,11 @@ const Login = () => {
                     Don't have an Account? <Link to="/register">Sign up</Link>
                 </div>
                 <div>
-                    <LoginBtn>
-                        <LoginBtnLink to="/">Login</LoginBtnLink>
-                    </LoginBtn>
+                    <Stack direction="row" spacing={2} justifyContent="center">
+                        <Button variant="contained" endIcon={<LoginIcon/>} onClick={() => loginUser()}>
+                            Login
+                        </Button>
+                    </Stack>
                 </div>
             </Paper>
         )
@@ -162,13 +161,15 @@ const Login = () => {
                         textShadow: "3px 3px #5C527F",
                         textDecorationLine: 'underline'}}>Login</h1>
                     <div style={{display:"inline-block",
-                        width: "100%"}}>
+                        width: "100%",
+                        marginBottom: "10px"}}>
                         {errorFlag?
-                            <Alert severity="error">
-                                <AlertTitle>Error</AlertTitle>
+                            <Alert severity="error" variant="filled">
                                 {errorMessage}
                             </Alert>
                             :""}
+                    </div>
+                    <div>
                         {login_rows()}
                     </div>
                 </Paper>
