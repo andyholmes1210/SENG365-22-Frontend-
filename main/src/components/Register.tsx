@@ -26,6 +26,8 @@ const Register = () => {
 
     const navigate = useNavigate()
 
+    const [file, setFile] = React.useState("")
+    const [filetype, setFileType] = React.useState("")
     const [errorFlag, setErrorFlag] = React.useState(false)
     const [errorMessage, setErrorMessage] = React.useState("")
     const [firstname, setFirstName] = React.useState("")
@@ -82,15 +84,23 @@ const Register = () => {
     }
 
 
-    // const uploadProfilePic = () => {
-    //     axios.put('http://localhost:4941/api/v1/users/' + localStorage.getItem("userId") + '/image', image.value, {headers:
-    //             {'X-Authorization' : localStorage.getItem("auth_token")!}})
-    //             .then((response) => {
-    //             }, (error) => {
-    //             setErrorFlag(true)
-    //             setErrorMessage(error.toString())
-    //         })
-    // }
+    const updateImageState = (event: any) => {
+        setFile(event.target.files[0])
+        setFileType(event.target.files[0].type)
+    }
+
+    const uploadProfilePic = () => {
+        axios.put('http://localhost:4941/api/v1/users/' + localStorage.getItem('userId') + '/image', file, {
+            headers:
+                {'X-Authorization': localStorage.getItem("auth_token")!,
+                    'Content-Type': filetype}
+        })
+            .then(()=>{
+            }, () => {
+                setErrorFlag(true)
+                setErrorMessage("Image must be jpg/gif/png")
+            })
+    }
 
     const registerUser = () => {
         if (firstname === "" || lastname === "" || email === "" || password.password === "") {
@@ -115,6 +125,9 @@ const Register = () => {
                             localStorage.setItem("auth_token", response.data.token)
                             localStorage.setItem("userId", response.data.userId)
                             navigate("/")
+                            if (file != '') {
+                                uploadProfilePic()
+                            }
                         }, (error) => {
                             setErrorFlag(true)
                             setErrorMessage(error.toString())
@@ -122,7 +135,6 @@ const Register = () => {
                 })
                 .catch((error) => {
                     setErrorMessage("Email already in used, please try again")
-                    // setErrorMessage(error.response.statusText)
                     setErrorFlag(true)
                 })
         }
@@ -134,7 +146,7 @@ const Register = () => {
             <Paper elevation={10} style={cardDiv}>
                 <div style={textBox}>
                     <h5>Select a profile picture (optional):</h5>
-                    <input type="file" accept="image/png, image/jpeg, image/gif"/>
+                    <input style={imageBox} type="file" onChange={updateImageState} accept="image/png, image/jpeg, image/gif" name="myfile"/>
                 </div>
 
                 <div style={textBox}>
@@ -185,6 +197,14 @@ const Register = () => {
         padding: "10px",
         marginTop: "18px",
         fontSize: "15px"
+    }
+
+    const imageBox: CSS.Properties = {
+        width: "100%",
+        margin: "auto",
+        textAlign: 'left',
+        marginTop: "15px",
+        marginBottom: "15px"
     }
 
     const textBox: CSS.Properties = {

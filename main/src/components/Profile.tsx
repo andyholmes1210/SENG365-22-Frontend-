@@ -35,6 +35,8 @@ const Profile = () => {
 
     const [errorFlag, setErrorFlag] = React.useState(false)
     const [errorMessage, setErrorMessage] = React.useState("")
+    const [editFlag, setEditFlag] = React.useState(false)
+    const [editMessage, setEditMessage] = React.useState("")
     const [userDetails, setUserDetails] = React.useState<Array<any>>([])
 
     const [firstname, setFirstname] = React.useState("")
@@ -141,44 +143,32 @@ const Profile = () => {
     },[])
 
     const updateUser = () => {
-        axios.patch('http://localhost:4941/api/v1/users/' + localStorage.getItem("userId"), {
-            "firstName": newfirstname,
-            "lastName": newlastname,
-            "email": newemail
-        }, {headers:
-                {'X-Authorization': localStorage.getItem("auth_token")!}})
-            .then((response) => {
-                handleEditDialogClose()
-                setSnackMessage("Edit Profile successfully")
-                setSnackOpen(true)
-                getUser()
-                if (file != '') {
-                    uploadProfilePic()
-                }
-            }, (error) => {
-                setErrorFlag(true)
-                setErrorMessage(error.toString())
-            })
+        if(newpassword.password.length < 6){
+            setEditFlag(true)
+            setEditMessage("New Password much be at least 6 characters in length!")
+        } else {
+            axios.patch('http://localhost:4941/api/v1/users/' + localStorage.getItem("userId"), {
+                "firstName": newfirstname,
+                "lastName": newlastname,
+                "email": newemail,
+                "password": newpassword.password,
+                "currentPassword": password.password
+            }, {headers:
+                    {'X-Authorization': localStorage.getItem("auth_token")!}})
+                .then((response) => {
+                    handleEditDialogClose()
+                    setSnackMessage("Edit Profile successfully")
+                    setSnackOpen(true)
+                    getUser()
+                    if (file != '') {
+                        uploadProfilePic()
+                    }
+                }, (error) => {
+                    setEditFlag(true)
+                    setEditMessage(error.response.statusText)
+                })
+        }
     }
-
-    const updateImageState = (event: any) => {
-        setFile(event.target.files[0])
-        setFileType(event.target.files[0].type)
-    }
-
-    // const getUserImage = () => {
-    //     axios.get('http://localhost:4941/api/v1/users/' + localStorage.getItem('userId') + '/image', {
-    //         headers:
-    //             {'X-Authorization': localStorage.getItem("auth_token")!,
-    //                 'Content-Type': filetype}
-    //     })
-    //         .then(()=>{
-    //
-    //     }, (error) => {
-    //             setErrorFlag(true)
-    //             setErrorMessage(error.toString())
-    //         })
-    // }
 
     const deleteImage = () => {
         axios.delete('http://localhost:4941/api/v1/users/' + localStorage.getItem('userId') + '/image', {
@@ -191,6 +181,11 @@ const Profile = () => {
                 setErrorFlag(true)
                 setErrorMessage(error.toString())
             })
+    }
+
+    const updateImageState = (event: any) => {
+        setFile(event.target.files[0])
+        setFileType(event.target.files[0].type)
     }
 
     const uploadProfilePic = () => {
@@ -277,6 +272,7 @@ const Profile = () => {
         event.target.src = "https://icon-library.com/images/default-profile-icon/default-profile-icon-24.jpg"
     }
 
+
     const profile_rows = () => {
         return (
             <Paper elevation={10} style={cardDiv}>
@@ -292,9 +288,14 @@ const Profile = () => {
                 </div>
                 <div style={{marginTop:"10px"}}>
                     <Stack direction="row" spacing={2} justifyContent="center">
-                        <Button variant="contained" color="error" endIcon={<DeleteIcon/>} onClick={() => {handleDeleteDialogOpen(file)}}>
+                        { localStorage.length !== 0?
+                            <Button variant="contained" color="error" endIcon={<DeleteIcon/>} onClick={() => {handleDeleteDialogOpen(file)}}>
+                                Delete
+                            </Button>:
+                            <Button variant="contained" color="error" endIcon={<DeleteIcon/>} disabled>
                             Delete
-                        </Button>
+                            </Button>
+                        }
                         <Dialog
                             open={openDeleteDialog}
                             onClose={handleDeleteDialogClose}
@@ -434,6 +435,11 @@ const Profile = () => {
                                         <DialogTitle id="alert-dialog-title">
                                             {"Edit User?"}
                                         </DialogTitle>
+                                        {editFlag?
+                                            <Alert severity="error" variant="filled">
+                                                {editMessage}
+                                            </Alert>
+                                            :""}
                                         <DialogContent>
                                             <h5>Select a new profile picture (optional):</h5>
                                             <input type="file" onChange={updateImageState} accept="image/png, image/jpeg, image/gif" name="myfile"/>
