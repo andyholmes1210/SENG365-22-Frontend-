@@ -83,7 +83,6 @@ const Register = () => {
         setLastName(event.target.value)
     }
 
-
     const updateImageState = (event: any) => {
         setFile(event.target.files[0])
         setFileType(event.target.files[0].type)
