@@ -1,8 +1,7 @@
-import {Link, useNavigate} from "react-router-dom";
 import CSS from "csstype";
 import {
     Alert,
-    AlertTitle, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
+    Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
     FormControl,
     Input,
     InputAdornment,
@@ -67,7 +66,7 @@ const Profile = () => {
 
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false)
 
-    const [dialogAuction, setDialogAuction] = React.useState<any>({
+    const [setDialogAuction] = React.useState<any>({
         image_filename: ""
     })
     const handleDeleteDialogOpen = (auction: any) => {
@@ -82,13 +81,12 @@ const Profile = () => {
     };
 
     const [openUpdateDialog, setOpenUpdateDialog] = React.useState(false)
-    const [editUser, setEditUser] = React.useState<any>({email:"",
+    const [setEditUser] = React.useState<any>({email:"",
                                                                     firstName:"",
                                                                     lastName:""})
-    const [dialogUser, setDialogUser] = React.useState<any>({email:"",
+    const [setDialogUser] = React.useState<any>({email:"",
                                                                         firstName:"",
                                                                         lastName:""})
-
     const handleEditDialogOpen = (user: any) => {
         setDialogUser(user)
         setOpenUpdateDialog(true);
@@ -160,7 +158,7 @@ const Profile = () => {
                     setSnackMessage("Edit Profile successfully")
                     setSnackOpen(true)
                     getUser()
-                    if (file != '') {
+                    if (file !== '') {
                         uploadProfilePic()
                     }
                 }, (error) => {
@@ -245,8 +243,8 @@ const Profile = () => {
             setFirstNameError(true);
             setFirstNameHelperText("Please enter First name");
         }
-
     }
+
     const updateNewLastNameState = (event: any) => {
         if(event.target.value.length > 0) {
             setLastNameError(false);
@@ -257,6 +255,7 @@ const Profile = () => {
             setLastNameHelperText("Please enter First name");
         }
     }
+
     const updateNewEmailState = (event: any) => {
         if (event.target.value.match("^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+")) {
             setEmailError(false);
@@ -280,10 +279,10 @@ const Profile = () => {
                     {localStorage.getItem("userId") === null?
                         <img style={{
                             height: "50%", width: "50%"}} src={"https://icon-library.com/images/default-profile-icon/default-profile-icon-24.jpg"}
-                             onError={getImageDefault}/>:
+                             onError={getImageDefault} alt=""/>:
                         <img style={{
                             height: "50%", width: "50%"}} src={'http://localhost:4941/api/v1/users/' + localStorage.getItem('userId') + '/image'}
-                             onError={getImageDefault}/>
+                             onError={getImageDefault} alt=""/>
                     }
                 </div>
                 <div style={{marginTop:"10px"}}>

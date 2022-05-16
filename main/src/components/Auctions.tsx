@@ -11,8 +11,15 @@ import {
     Paper,
     Stack,
     Alert,
-    AlertTitle,
-    Typography, Pagination
+    Typography,
+    Pagination,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Dialog,
+    TextField,
+    InputLabel,
+    OutlinedInput, InputAdornment, FormControl
 } from
         "@mui/material";
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
@@ -20,14 +27,50 @@ import AddIcon from '@mui/icons-material/Add';
 
 const Auctions = () => {
 
-    const navigate = useNavigate()
+    //const navigate = useNavigate()
     const [errorFlag, setErrorFlag] = React.useState(false)
     const [errorMessage, setErrorMessage] = React.useState("")
     const [auctions, setAuctions] = React.useState<Array<Auctions>>([])
-    const [category, setCategory] = React.useState<Array<Category>>([])
+    const [categories, setCategories] = React.useState<Array<Category>>([])
     const [count] = React.useState(10)
     const [index, setIndex] = React.useState(0)
     const [totalpage, setTotalpage] = React.useState(0)
+
+    const [file, setFile] = React.useState("")
+    const [filetype, setFileType] = React.useState("")
+    const [title, setTitle] = React.useState("")
+    const [category, setCategory] = React.useState("")
+    const [endDate, setEndDate] = React.useState(new Date())
+    const [description, setDescription] = React.useState("")
+    const [reservePrice, setReservePrice] = React.useState(1)
+    const [AuctionFlag, setAuctionFlag] = React.useState(false)
+    const [AuctionMessage, setAuctionMessage] = React.useState("")
+
+    const [openAddAuctionDialog, setOpenAddAuctionDialog] = React.useState(false)
+    const [AddAuction, setAddAction] = React.useState<any>({title:"",
+        description:"",
+        categotyId:"",
+        endDate: new Date(),
+        reserve: 0})
+    const [setDialogAddAuction] = React.useState<any>({title:"",
+        description:"",
+        categotyId:"",
+        endDate: new Date(),
+        reserve: 0})
+
+    const handleAddAuctionDialogOpen = (addAuction: any) => {
+        setDialogAddAuction(addAuction)
+        setOpenAddAuctionDialog(true);
+    };
+
+    const handleAddAuctionDialogClose = () => {
+        setAddAction({title:"",
+            description:"",
+            categotyId:"",
+            endDate: new Date(),
+            reserve: 0})
+        setOpenAddAuctionDialog(false);
+    };
 
     const paginationPage = (event: React.ChangeEvent<unknown>, value: number) => {
         setIndex((value * count) - count)
@@ -52,16 +95,68 @@ const Auctions = () => {
             })
     }
 
+    const addAuction = () => {
+        if(title === ""){
+            setAuctionFlag(true)
+            setAuctionMessage("Must Provide a Title!")
+        } else if (description === ""){
+            setAuctionFlag(true)
+            setAuctionMessage("Must Provide a Description!")
+        } else if (reservePrice < 1){
+            setAuctionFlag(true)
+            setAuctionMessage("Reserve Price must be 1 or higher!")
+        } else {
+            axios.post('http://localhost:4941/api/v1/auctions', {
+                    "title": title,
+                    "description": description,
+                    "categoryId": categories,
+                    "endDate": endDate,
+                    "reserve": reservePrice},
+                {headers:
+                        {'X-Authorization': localStorage.getItem("auth_token")!}})
+                .then((response) => {
+                    uploadAuctionPic()
+                    getAuctions()
+                }, (error) => {
+                    setErrorFlag(true)
+                    setErrorMessage(error.toString())
+                })
+        }
+    }
+
     const getCategory = () => {
         axios.get('http://localhost:4941/api/v1/auctions/categories')
             .then((response) => {
                 setErrorFlag(false)
                 setErrorMessage("")
-                setCategory(response.data)
+                setCategories(response.data)
             }, (error) => {
                 setErrorFlag(true)
                 setErrorMessage(error.toString())
             })
+    }
+
+    const updateImageState = (event: any) => {
+        setFile(event.target.files[0])
+        setFileType(event.target.files[0].type)
+    }
+
+    const uploadAuctionPic = () => {
+        if(file === "") {
+            setAuctionFlag(true)
+            setAuctionMessage("Must Provide a Photo of the Auction!")
+        } else {
+            axios.put('http://localhost:4941/api/v1/auction/' + auctions[-1].auctionId + '/image', file, {
+                headers:
+                    {'X-Authorization': localStorage.getItem("auth_token")!,
+                        'Content-Type': filetype}
+            })
+                .then(()=>{
+                }, () => {
+                    setErrorFlag(true)
+                    setErrorMessage("Image must be jpg/gif/png")
+                })
+        }
     }
 
     const checkNull = (x: any) => {
@@ -106,6 +201,18 @@ const Auctions = () => {
         }
     }
 
+    const updateTitleState = (event: any) => {
+        setTitle(event.target.value)
+    }
+
+    const updateDescriptionState = (event: any) => {
+        setDescription(event.target.value)
+    }
+
+    const updateReserveState = (event: any) => {
+        setReservePrice(+event.target.value)
+    }
+
     const getImageDefault = (event: any) => {
         event.target.src = "https://icon-library.com/images/default-profile-icon/default-profile-icon-24.jpg"
     }
@@ -141,7 +248,7 @@ const Auctions = () => {
                         width: "180px",
                         borderRadius: "15px"}}
                          src={"http://localhost:4941/api/v1/auctions/" + row.auctionId + "/image"}
-                         onError={getAuctionDefault}/>
+                         onError={getAuctionDefault} alt=""/>
                     </div>
                     <div style={{display:"inline-block",
                         width: "300px"}}>
@@ -155,7 +262,7 @@ const Auctions = () => {
                     <div style={{display:"inline-block",
                         width: "150px"}}>
                         <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline', color: '#fff'}}> Category: </h6>
-                        <h6 style={{fontSize: "15px", color: '#fff'}}> {category.filter(function checkCategory(x:any) {
+                        <h6 style={{fontSize: "15px", color: '#fff'}}> {categories.filter(function checkCategory(x:any) {
                             return x.categoryId === row.categoryId
                         }).map((x) => x.name)} </h6>
                     </div>
@@ -164,7 +271,7 @@ const Auctions = () => {
                         <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline', color: '#fff'}}> Seller:</h6>
                         <h6 style={{fontSize: "15px", color: '#fff'}}>
                             {row.sellerFirstName} {row.sellerLastName} <img style={{
-                            height: "30px", width: "30px"}} src={"http://localhost:4941/api/v1/users/" + row.sellerId + "/image"} onError={getImageDefault}/>
+                            height: "30px", width: "30px"}} src={"http://localhost:4941/api/v1/users/" + row.sellerId + "/image"} onError={getImageDefault} alt=""/>
                         </h6>
                     </div>
                     <div style={{float:"left",
@@ -201,6 +308,13 @@ const Auctions = () => {
         borderRadius: "15px"
     }
 
+    const textBox: CSS.Properties = {
+        width: "45%",
+        margin: "auto",
+        textAlign: 'left',
+        padding: "5px 5px"
+    }
+
     return (
         <div>
             <Navbar/>
@@ -210,9 +324,68 @@ const Auctions = () => {
                         width:"13%",
                         margin: "auto"}}>
                         <Stack direction="row" spacing={2} justifyContent="right">
-                            <Button variant="contained" color="success" endIcon={<AddIcon/>}>
-                                Add Auction
-                            </Button>
+                            { localStorage.length === 0?
+                                <Button variant="contained" color="success" endIcon={<AddIcon/>} disabled>
+                                    Add Auction
+                                </Button>:
+                                <Button variant="contained" color="success" endIcon={<AddIcon/>} onClick={() => handleAddAuctionDialogOpen(AddAuction)}>
+                                    Add Auction
+                                </Button>
+                            }
+                            <Dialog
+                                open={openAddAuctionDialog}
+                                onClose={handleAddAuctionDialogClose}
+                                aria-labelledby="alert-dialog-title"
+                                aria-describedby="alert-dialog-description">
+                                <DialogTitle id="alert-dialog-title">
+                                    {"Add Auction"}
+                                </DialogTitle>
+                                {AuctionFlag?
+                                    <Alert severity="error" variant="filled" >
+                                        {AuctionMessage}
+                                    </Alert>
+                                    :""}
+                                <DialogContent>
+                                    <h5>Select an Auction Picture:</h5>
+                                    <input type="file" onChange={updateImageState} accept="image/png, image/jpeg, image/gif" name="myfile"/>
+                                </DialogContent>
+                                <DialogContent style={{padding: "10px 10px"}}>
+                                    <TextField fullWidth id="outlined-multiline-flexible"
+                                               label="Title"
+                                               multiline
+                                               maxRows={2}
+                                               helperText="Please enter a Title"
+                                               defaultValue={title}
+                                               onChange={updateTitleState}/>
+                                </DialogContent>
+                                <DialogContent style={{padding: "10px 10px"}}>
+                                    <TextField fullWidth id="outlined-multiline-flexible"
+                                               label="Description"
+                                               multiline
+                                               maxRows={4}
+                                               helperText="Please enter a Description"
+                                               defaultValue={description}
+                                               onChange={updateDescriptionState}/>
+                                </DialogContent>
+                                <DialogContent style={textBox}>
+                                    <FormControl sx={{ m: 1 }}>
+                                        <InputLabel htmlFor="outlined-adornment-amount">Amount</InputLabel>
+                                        <OutlinedInput
+                                            id="outlined-adornment-amount"
+                                            value={reservePrice}
+                                            onChange={updateReserveState}
+                                            startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                                            label="Amount"
+                                        />
+                                    </FormControl>
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={handleAddAuctionDialogClose}>Cancel</Button>
+                                    <Button variant="outlined" color="success" onClick={() => {addAuction()}} autoFocus>
+                                        Add
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
                         </Stack>
                     </div>
                     <div style={{display:"inline-block",

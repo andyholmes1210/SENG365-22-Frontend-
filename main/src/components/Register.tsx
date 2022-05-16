@@ -2,7 +2,7 @@ import {Link, useNavigate} from "react-router-dom";
 import CSS from "csstype";
 import {
     Alert,
-    AlertTitle, Button,
+    Button,
     FormControl,
     Input,
     InputAdornment,
@@ -41,7 +41,6 @@ const Register = () => {
         password: '',
         showPassword: false,
     });
-    const [image, setImage] = React.useState("")
 
     const handleChange =
         (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,7 +56,7 @@ const Register = () => {
 
     React.useEffect(() => {
 
-    },[image])
+    },[])
 
 
     const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -124,7 +123,7 @@ const Register = () => {
                             localStorage.setItem("auth_token", response.data.token)
                             localStorage.setItem("userId", response.data.userId)
                             navigate("/")
-                            if (file != '') {
+                            if (file !== '') {
                                 uploadProfilePic()
                             }
                         }, (error) => {
@@ -140,7 +139,6 @@ const Register = () => {
     }
 
     const register_rows = () => {
-        console.log(image)
         return (
             <Paper elevation={10} style={cardDiv}>
                 <div style={textBox}>
