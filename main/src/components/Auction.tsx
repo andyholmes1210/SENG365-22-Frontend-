@@ -764,8 +764,8 @@ const Auction = () => {
         width: "65%",
         backgroundColor: '#3E2C41',
         borderRadius: "15px",
-        marginTop: "5%",
-        marginBottom: "5%"
+        marginTop: "1%",
+        marginBottom: "1%"
     }
 
     const cardDiv: CSS.Properties = {

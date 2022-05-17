@@ -32,7 +32,7 @@ const Auctions = () => {
     const [errorMessage, setErrorMessage] = React.useState("")
     const [auctions, setAuctions] = React.useState<Array<Auctions>>([])
     const [categories, setCategories] = React.useState<Array<Category>>([])
-    const [count] = React.useState(10)
+    const [count, setCount] = React.useState(10)
     const [index, setIndex] = React.useState(0)
     const [totalpage, setTotalpage] = React.useState(0)
 
@@ -52,7 +52,7 @@ const Auctions = () => {
         categotyId:"",
         endDate: new Date(),
         reserve: 0})
-    const [setDialogAddAuction] = React.useState<any>({title:"",
+    const [dialogAddAuction, setDialogAddAuction] = React.useState<any>({title:"",
         description:"",
         categotyId:"",
         endDate: new Date(),

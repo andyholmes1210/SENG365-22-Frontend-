@@ -28,6 +28,7 @@ const Profile = () => {
 
     const [file, setFile] = React.useState("")
     const [filetype, setFileType] = React.useState("")
+    const [userImage, setUserImage] = React.useState(null)
 
     const [loginFlag, setLoginFlag] = React.useState(false)
     const [loginMessage, setLoginMessage] = React.useState("")
@@ -66,7 +67,7 @@ const Profile = () => {
 
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false)
 
-    const [setDialogAuction] = React.useState<any>({
+    const [dialogAuction, setDialogAuction] = React.useState<any>({
         image_filename: ""
     })
     const handleDeleteDialogOpen = (auction: any) => {
@@ -81,10 +82,10 @@ const Profile = () => {
     };
 
     const [openUpdateDialog, setOpenUpdateDialog] = React.useState(false)
-    const [setEditUser] = React.useState<any>({email:"",
+    const [editUser, setEditUser] = React.useState<any>({email:"",
                                                                     firstName:"",
                                                                     lastName:""})
-    const [setDialogUser] = React.useState<any>({email:"",
+    const [dialogUser, setDialogUser] = React.useState<any>({email:"",
                                                                         firstName:"",
                                                                         lastName:""})
     const handleEditDialogOpen = (user: any) => {
@@ -138,13 +139,18 @@ const Profile = () => {
 
     React.useEffect(() => {
         getUser()
-    },[])
+        getUserImage()
+    },[userImage])
 
     const updateUser = () => {
-        if(newpassword.password.length < 6){
-            setEditFlag(true)
-            setEditMessage("New Password much be at least 6 characters in length!")
-        } else {
+        if (file !== '') {
+            uploadProfilePic()
+        } else if(newpassword.password !== ""){
+            if(newpassword.password.length < 6) {
+                setEditFlag(true)
+                setEditMessage("New Password much be at least 6 characters in length!")
+            }
+        } else{
             axios.patch('http://localhost:4941/api/v1/users/' + localStorage.getItem("userId"), {
                 "firstName": newfirstname,
                 "lastName": newlastname,
@@ -158,14 +164,21 @@ const Profile = () => {
                     setSnackMessage("Edit Profile successfully")
                     setSnackOpen(true)
                     getUser()
-                    if (file !== '') {
-                        uploadProfilePic()
-                    }
                 }, (error) => {
                     setEditFlag(true)
                     setEditMessage(error.response.statusText)
                 })
         }
+    }
+
+    const getUserImage = () => {
+        axios.get('http://localhost:4941/api/v1/users/' + localStorage.getItem('userId') + '/image')
+            .then((response) => {
+                setUserImage(response.data)
+            },() => {
+                setUserImage(null)
+            })
+
     }
 
     const deleteImage = () => {
@@ -179,6 +192,9 @@ const Profile = () => {
                 setErrorFlag(true)
                 setErrorMessage(error.toString())
             })
+        window.location.href = window.location.href
+        setSnackMessage("Delete Profile picture successfully")
+        setSnackOpen(true)
     }
 
     const updateImageState = (event: any) => {
@@ -193,10 +209,14 @@ const Profile = () => {
                 'Content-Type': filetype}
         })
             .then(()=>{
+                handleEditDialogClose()
             }, () => {
                 setErrorFlag(true)
                 setErrorMessage("Image must be jpg/gif/png")
             })
+        window.location.href = window.location.href
+        setSnackMessage("Edit Profile successfully")
+        setSnackOpen(true)
     }
 
     const getUser = () => {
@@ -271,6 +291,8 @@ const Profile = () => {
         event.target.src = "https://icon-library.com/images/default-profile-icon/default-profile-icon-24.jpg"
     }
 
+    console.log(userImage)
+
 
     const profile_rows = () => {
         return (
@@ -287,12 +309,12 @@ const Profile = () => {
                 </div>
                 <div style={{marginTop:"10px"}}>
                     <Stack direction="row" spacing={2} justifyContent="center">
-                        { localStorage.length !== 0?
-                            <Button variant="contained" color="error" endIcon={<DeleteIcon/>} onClick={() => {handleDeleteDialogOpen(file)}}>
+                        { userImage === null || localStorage.length === 0?
+                            <Button variant="contained" color="error" endIcon={<DeleteIcon/>} disabled>
                                 Delete
                             </Button>:
-                            <Button variant="contained" color="error" endIcon={<DeleteIcon/>} disabled>
-                            Delete
+                            <Button variant="contained" color="error" endIcon={<DeleteIcon/>} onClick={() => {handleDeleteDialogOpen(file)}}>
+                                Delete
                             </Button>
                         }
                         <Dialog
@@ -315,6 +337,17 @@ const Profile = () => {
                                 </Button>
                             </DialogActions>
                         </Dialog>
+                        <Snackbar
+                            autoHideDuration={6000}
+                            open={snackOpen}
+                            onClose={handleSnackClose}
+                            key={snackMessage}
+                        >
+                            <Alert onClose={handleSnackClose} severity="success" sx={{
+                                width: '100%' }}>
+                                {snackMessage}
+                            </Alert>
+                        </Snackbar>
                     </Stack>
                 </div>
                 {localStorage.length !== 0 ?
