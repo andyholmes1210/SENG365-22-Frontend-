@@ -143,20 +143,34 @@ const Profile = () => {
     },[userImage])
 
     const updateUser = () => {
-        if (file !== '') {
-            uploadProfilePic()
-        } else if(newpassword.password !== ""){
+         if(newpassword.password !== ""){
             if(newpassword.password.length < 6) {
                 setEditFlag(true)
                 setEditMessage("New Password much be at least 6 characters in length!")
+            } else {
+                axios.patch('http://localhost:4941/api/v1/users/' + localStorage.getItem("userId"), {
+                    "password": newpassword.password,
+                    "currentPassword": password.password
+                }, {headers:
+                        {'X-Authorization': localStorage.getItem("auth_token")!}})
+                    .then((response) => {
+                        handleEditDialogClose()
+                        setSnackMessage("Edit Profile successfully")
+                        setSnackOpen(true)
+                        getUser()
+                        if (file !== '') {
+                            uploadProfilePic()
+                        }
+                    }, (error) => {
+                        setEditFlag(true)
+                        setEditMessage(error.response.statusText)
+                    })
             }
         } else{
             axios.patch('http://localhost:4941/api/v1/users/' + localStorage.getItem("userId"), {
                 "firstName": newfirstname,
                 "lastName": newlastname,
                 "email": newemail,
-                "password": newpassword.password,
-                "currentPassword": password.password
             }, {headers:
                     {'X-Authorization': localStorage.getItem("auth_token")!}})
                 .then((response) => {
@@ -164,6 +178,9 @@ const Profile = () => {
                     setSnackMessage("Edit Profile successfully")
                     setSnackOpen(true)
                     getUser()
+                    if (file !== '') {
+                        uploadProfilePic()
+                    }
                 }, (error) => {
                     setEditFlag(true)
                     setEditMessage(error.response.statusText)

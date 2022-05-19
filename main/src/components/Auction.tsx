@@ -279,7 +279,8 @@ const Auction = () => {
     }
 
     const deleteAuction = () => {
-        axios.delete('http://localhost:4941/api/v1/auctions/' + id)
+        axios.delete('http://localhost:4941/api/v1/auctions/' + id, {headers:
+                {'X-Authorization': localStorage.getItem("auth_token")!}})
             .then(() => {
                 handleDeleteDialogClose()
                 navigate("/")

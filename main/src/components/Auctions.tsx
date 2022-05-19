@@ -5,6 +5,8 @@ import CSS from 'csstype';
 import Navbar from "./Navbar/NavbarDefault";
 import {NavBottom} from "./Navbar/NavbarElement";
 import {BtnLink, Btn} from "./ButtonElement";
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 import {
     Button,
@@ -19,13 +21,41 @@ import {
     Dialog,
     TextField,
     InputLabel,
-    OutlinedInput, InputAdornment, FormControl
+    OutlinedInput, InputAdornment, FormControl, Select, MenuItem, Snackbar
 } from
         "@mui/material";
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import AddIcon from '@mui/icons-material/Add';
+import {DesktopDateTimePicker} from "@mui/x-date-pickers";
 
 const Auctions = () => {
+
+    const allCategory = [ {categoryId: 1, name: 'Smartphones'},
+        {categoryId: 2, name: 'Computers & Laptops'},
+        {categoryId: 3, name: 'Books'},
+        {categoryId: 4, name: 'CDs'},
+        {categoryId: 5, name: 'DVDs'},
+        {categoryId: 6, name: 'Motorbikes'},
+        {categoryId: 7, name: 'Bicycles'},
+        {categoryId: 8, name: 'Farm Equipment'},
+        {categoryId: 9, name: 'Jewellery'},
+        {categoryId: 10, name: 'Homeware'},
+        {categoryId: 11, name: 'Furniture'},
+        {categoryId: 12, name: 'Watches'},
+        {categoryId: 13, name: 'Instruments'},
+        {categoryId: 14, name: 'Electronics'},
+        {categoryId: 15, name: 'Office Equipment'},
+        {categoryId: 16, name: 'Tablets'},
+        {categoryId: 17, name: 'Paintings & Sculptures'},
+        {categoryId: 18, name: 'Bulk Items'},
+        {categoryId: 19, name: 'Gaming Consoles'},
+        {categoryId: 20, name: 'Hair Care'},
+        {categoryId: 21, name: 'Perfume'},
+        {categoryId: 22, name: 'Clothing'},
+        {categoryId: 23, name: 'Lego'},
+        {categoryId: 24, name: 'Figurines'},
+        {categoryId: 25, name: 'Cars'},
+    ];
 
     //const navigate = useNavigate()
     const [errorFlag, setErrorFlag] = React.useState(false)
@@ -35,12 +65,11 @@ const Auctions = () => {
     const [count, setCount] = React.useState(10)
     const [index, setIndex] = React.useState(0)
     const [totalpage, setTotalpage] = React.useState(0)
-
     const [file, setFile] = React.useState("")
     const [filetype, setFileType] = React.useState("")
     const [title, setTitle] = React.useState("")
     const [category, setCategory] = React.useState("")
-    const [endDate, setEndDate] = React.useState(new Date())
+    const [endDate, setEndDate] = React.useState<Date | null>(new Date());
     const [description, setDescription] = React.useState("")
     const [reservePrice, setReservePrice] = React.useState(1)
     const [AuctionFlag, setAuctionFlag] = React.useState(false)
@@ -72,6 +101,16 @@ const Auctions = () => {
         setOpenAddAuctionDialog(false);
     };
 
+    const [snackOpen, setSnackOpen] = React.useState(false)
+    const [snackMessage, setSnackMessage] = React.useState("")
+    const handleSnackClose = (event?: React.SyntheticEvent | Event,
+                              reason?: string) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSnackOpen(false);
+    };
+
     const paginationPage = (event: React.ChangeEvent<unknown>, value: number) => {
         setIndex((value * count) - count)
         getAuctions()
@@ -96,7 +135,10 @@ const Auctions = () => {
     }
 
     const addAuction = () => {
-        if(title === ""){
+        if(file === "") {
+            setAuctionFlag(true)
+            setAuctionMessage("Must Provide a Photo of the Auction!")
+        } else if(title === ""){
             setAuctionFlag(true)
             setAuctionMessage("Must Provide a Title!")
         } else if (description === ""){
@@ -105,21 +147,30 @@ const Auctions = () => {
         } else if (reservePrice < 1){
             setAuctionFlag(true)
             setAuctionMessage("Reserve Price must be 1 or higher!")
+        } else if (endDate === null || endDate < new Date()){
+            setAuctionFlag(true)
+            setAuctionMessage("Must Provide an End Date!")
+        } else if (category === ""){
+            setAuctionFlag(true)
+            setAuctionMessage("Must Provide a Category!")
         } else {
             axios.post('http://localhost:4941/api/v1/auctions', {
                     "title": title,
                     "description": description,
-                    "categoryId": categories,
-                    "endDate": endDate,
+                    "categoryId": category,
+                    "endDate": endDate.toISOString().replace("T", " ").replace("Z", ""),
                     "reserve": reservePrice},
                 {headers:
                         {'X-Authorization': localStorage.getItem("auth_token")!}})
                 .then((response) => {
-                    uploadAuctionPic()
+                    uploadAuctionPic(response.data.auctionId)
                     getAuctions()
+                    window.location.href = window.location.href
+                    setSnackMessage("Edit Profile successfully")
+                    setSnackOpen(true)
                 }, (error) => {
-                    setErrorFlag(true)
-                    setErrorMessage(error.toString())
+                    setAuctionFlag(true)
+                    setAuctionMessage(error.response.statusText)
                 })
         }
     }
@@ -141,12 +192,8 @@ const Auctions = () => {
         setFileType(event.target.files[0].type)
     }
 
-    const uploadAuctionPic = () => {
-        if(file === "") {
-            setAuctionFlag(true)
-            setAuctionMessage("Must Provide a Photo of the Auction!")
-        } else {
-            axios.put('http://localhost:4941/api/v1/auction/' + auctions[-1].auctionId + '/image', file, {
+    const uploadAuctionPic = (id: any) => {
+            axios.put('http://localhost:4941/api/v1/auctions/' + id + '/image', file, {
                 headers:
                     {'X-Authorization': localStorage.getItem("auth_token")!,
                         'Content-Type': filetype}
@@ -157,7 +204,6 @@ const Auctions = () => {
                     setErrorMessage("Image must be jpg/gif/png")
                 })
         }
-    }
 
     const checkNull = (x: any) => {
         if(x === null){
@@ -211,6 +257,11 @@ const Auctions = () => {
 
     const updateReserveState = (event: any) => {
         setReservePrice(+event.target.value)
+    }
+
+
+    const updateCategoryState = (event: any) => {
+        setCategory(event.target.value)
     }
 
     const getImageDefault = (event: any) => {
@@ -379,6 +430,40 @@ const Auctions = () => {
                                         />
                                     </FormControl>
                                 </DialogContent>
+                                <DialogContent style={textBox}>
+                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                        <DesktopDateTimePicker
+                                            label="Pick Date and Time"
+                                            value={endDate}
+                                            onChange={(newValue) => {
+                                                setEndDate(newValue);
+                                            }}
+                                            renderInput={(params) => <TextField {...params} />}
+                                            minDateTime={new Date()}
+                                        />
+                                    </LocalizationProvider>
+                                </DialogContent>
+                                <DialogContent style={{
+                                    width: "70%",
+                                    margin: "auto",
+                                    textAlign: 'left',
+                                    padding: "5px 5px"
+                                }}>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="demo-simple-select-label">Category</InputLabel>
+                                        <Select
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            value={category}
+                                            label="Category"
+                                            onChange={updateCategoryState}
+                                        >
+                                            {allCategory.map((category) =>
+                                            <MenuItem value={category.categoryId}>{category.name}</MenuItem>
+                                            )}
+                                        </Select>
+                                    </FormControl>
+                                </DialogContent>
                                 <DialogActions>
                                     <Button onClick={handleAddAuctionDialogClose}>Cancel</Button>
                                     <Button variant="outlined" color="success" onClick={() => {addAuction()}} autoFocus>
@@ -386,6 +471,17 @@ const Auctions = () => {
                                     </Button>
                                 </DialogActions>
                             </Dialog>
+                            <Snackbar
+                                autoHideDuration={6000}
+                                open={snackOpen}
+                                onClose={handleSnackClose}
+                                key={snackMessage}
+                            >
+                                <Alert onClose={handleSnackClose} severity="success" sx={{
+                                    width: '100%' }}>
+                                    {snackMessage}
+                                </Alert>
+                            </Snackbar>
                         </Stack>
                     </div>
                     <div style={{display:"inline-block",
@@ -444,7 +540,6 @@ const Auctions = () => {
             <NavBottom/>
         </div>
     )
-
 }
 
 export default Auctions;
