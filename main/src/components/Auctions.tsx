@@ -166,7 +166,7 @@ const Auctions = () => {
                     uploadAuctionPic(response.data.auctionId)
                     getAuctions()
                     window.location.href = window.location.href
-                    setSnackMessage("Edit Profile successfully")
+                    setSnackMessage("Add Auction successfully")
                     setSnackOpen(true)
                 }, (error) => {
                     setAuctionFlag(true)
@@ -203,7 +203,7 @@ const Auctions = () => {
                     setErrorFlag(true)
                     setErrorMessage("Image must be jpg/gif/png")
                 })
-        }
+    }
 
     const checkNull = (x: any) => {
         if(x === null){

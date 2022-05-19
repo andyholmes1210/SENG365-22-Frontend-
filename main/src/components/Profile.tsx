@@ -308,9 +308,6 @@ const Profile = () => {
         event.target.src = "https://icon-library.com/images/default-profile-icon/default-profile-icon-24.jpg"
     }
 
-    console.log(userImage)
-
-
     const profile_rows = () => {
         return (
             <Paper elevation={10} style={cardDiv}>

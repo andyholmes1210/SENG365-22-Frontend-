@@ -6,9 +6,9 @@ import {
     Dialog,
     DialogActions,
     DialogContent, DialogContentText,
-    DialogTitle, FormControl, InputAdornment, InputLabel, OutlinedInput,
-    Paper, Snackbar,
-    Stack, TableBody, TableCell, TableHead, TableRow,
+    DialogTitle, FormControl, InputAdornment, InputLabel, MenuItem, OutlinedInput,
+    Paper, Select, Snackbar,
+    Stack, TableBody, TableCell, TableHead, TableRow, TextField,
 } from "@mui/material";
 import {NavTop, NavBottom, NavBtnLink} from "./Navbar/NavbarElement";
 import React from "react";
@@ -19,9 +19,40 @@ import ArticleIcon from '@mui/icons-material/Article';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Auctions from "./Auctions";
+import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
+import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
+import {DesktopDateTimePicker} from "@mui/x-date-pickers";
 
 
 const Auction = () => {
+
+    const allCategory = [ {categoryId: 1, name: 'Smartphones'},
+        {categoryId: 2, name: 'Computers & Laptops'},
+        {categoryId: 3, name: 'Books'},
+        {categoryId: 4, name: 'CDs'},
+        {categoryId: 5, name: 'DVDs'},
+        {categoryId: 6, name: 'Motorbikes'},
+        {categoryId: 7, name: 'Bicycles'},
+        {categoryId: 8, name: 'Farm Equipment'},
+        {categoryId: 9, name: 'Jewellery'},
+        {categoryId: 10, name: 'Homeware'},
+        {categoryId: 11, name: 'Furniture'},
+        {categoryId: 12, name: 'Watches'},
+        {categoryId: 13, name: 'Instruments'},
+        {categoryId: 14, name: 'Electronics'},
+        {categoryId: 15, name: 'Office Equipment'},
+        {categoryId: 16, name: 'Tablets'},
+        {categoryId: 17, name: 'Paintings & Sculptures'},
+        {categoryId: 18, name: 'Bulk Items'},
+        {categoryId: 19, name: 'Gaming Consoles'},
+        {categoryId: 20, name: 'Hair Care'},
+        {categoryId: 21, name: 'Perfume'},
+        {categoryId: 22, name: 'Clothing'},
+        {categoryId: 23, name: 'Lego'},
+        {categoryId: 24, name: 'Figurines'},
+        {categoryId: 25, name: 'Cars'},
+    ];
+
     let {id} = useParams();
     const navigate = useNavigate()
     const [errorFlag, setErrorFlag] = React.useState(false)
@@ -32,6 +63,34 @@ const Auction = () => {
     const [highestBidderId, sethighestBidderId] = React.useState(0)
     const [highestFirstnameBidder, sethighestFirstnameBidder] = React.useState("")
     const [highestLastnameBidder, sethighestLastnameBidder] = React.useState("")
+
+    const [file, setFile] = React.useState("")
+    const [filetype, setFileType] = React.useState("")
+    const [userImage, setUserImage] = React.useState(null)
+
+    const [title, setTitle] = React.useState("")
+    const [newTitle, setNewTitle] = React.useState("")
+    const [TitleError, setTitleError] = React.useState(false)
+    const [TitleHelperText, setTitleHelperText] = React.useState("")
+
+    const [description, setDescription] = React.useState("")
+    const [newDescription, setNewDescription] = React.useState("")
+    const [DescriptionError, setDescriptionError] = React.useState(false)
+    const [DescriptionHelperText, setDescriptionHelperText] = React.useState("")
+
+    const [categories, setCategories] = React.useState<any>({})
+    const [newCategories, setNewCategories] = React.useState("")
+
+    const [endDate, setEndDate] = React.useState<Date | any>(new Date())
+    const [newEndDate, setNewEndDate] = React.useState<Date | any>(new Date())
+
+    const [reserve, setReserve] = React.useState(0)
+    const [newReserve, setNewReserve] = React.useState(0)
+    const [ReserveError, setReserveError] = React.useState(false)
+
+    const [EditAuctionFlag, setEditAuctionFlag] = React.useState(false)
+    const [EditAuctionMessage, setEditAuctionMessage] = React.useState("")
+
     const [similarauction, setSimilarAuction] = React.useState<Array<any>>([{
         auctionId: 0,
         title: "",
@@ -203,7 +262,6 @@ const Auction = () => {
         setOpenDeleteDialog(false);
     };
 
-
     const [bid, setBid] = React.useState(0)
     const [openBidDialog, setOpenBidDialog] = React.useState(false)
     const [BidFlag, setBidFlag] = React.useState(false)
@@ -249,6 +307,31 @@ const Auction = () => {
         setOpenBidDialog(false);
     };
 
+    const [openEditDialog, setOpenEditDialog] = React.useState(false)
+    const [editAuction, setEditAuction] = React.useState<any>({title:"",
+        description:"",
+        endDate:"",
+        reserve:0,
+        categoryId:""})
+    const [dialogEditAuction, setDialogEditAuction] = React.useState<any>({title:"",
+        description:"",
+        endDate:"",
+        reserve:0,
+        categoryId:""})
+    const handleEditDialogOpen = (auction: any) => {
+        setDialogEditAuction(auction)
+        setOpenEditDialog(true);
+    };
+
+    const handleEditDialogClose = () => {
+        setEditAuction({title:"",
+            description:"",
+            endDate:"",
+            reserve:0,
+            categoryId:""})
+        setOpenEditDialog(false);
+    };
+
     const [snackOpen, setSnackOpen] = React.useState(false)
     const [snackMessage, setSnackMessage] = React.useState("")
     const handleSnackClose = (event?: React.SyntheticEvent | Event,
@@ -272,6 +355,11 @@ const Auction = () => {
                 setErrorMessage("")
                 setAuction(response.data)
                 getSimilarAuction(response.data.categoryId)
+                updateTitleState(response.data.title)
+                updateDescriptionState(response.data.description)
+                updateReserveState(response.data.reserve)
+                updateCategoryIdState(response.data.categoryId)
+                updateEndDateState(response.data.endDate)
             }, (error) => {
                 setErrorFlag(true)
                 setErrorMessage(error.toString())
@@ -287,6 +375,56 @@ const Auction = () => {
             }, (error) => {
                 setErrorFlag(true)
                 setErrorMessage(error.toString())
+            })
+    }
+
+    const updateAuction = () => {
+        if (endDate === null || endDate < new Date()){
+            setEditAuctionFlag(true)
+            setEditAuctionMessage("Must Provide an End Date!")
+        } else if(title === ""){
+            setEditAuctionFlag(true)
+            setEditAuctionMessage("Must Provide a Title!")
+        } else if (description === ""){
+            setEditAuctionFlag(true)
+            setEditAuctionMessage("Must Provide a Description!")
+        } else {
+            axios.patch('http://localhost:4941/api/v1/auctions/' + id, {
+                    "title": newTitle,
+                    "description": newDescription,
+                    "reserve": newReserve,
+                    "endDate": endDate,
+                    "categoryId": newCategories
+                },
+                {headers: {'X-Authorization' : localStorage.getItem("auth_token")!}})
+                .then(() => {
+                    if (file !== '') {
+                        uploadAuctionPic()
+                    }
+                    getOneAuction()
+                }, (error) => {
+                    setErrorFlag(true)
+                    setErrorMessage(error.toString())
+                })
+        }
+
+    }
+
+    const updateImageState = (event: any) => {
+        setFile(event.target.files[0])
+        setFileType(event.target.files[0].type)
+    }
+
+    const uploadAuctionPic = () => {
+        axios.put('http://localhost:4941/api/v1/auctions/' + id + '/image', file, {
+            headers:
+                {'X-Authorization': localStorage.getItem("auth_token")!,
+                    'Content-Type': filetype}
+        })
+            .then(()=>{
+            }, () => {
+                setErrorFlag(true)
+                setErrorMessage("Image must be jpg/gif/png")
             })
     }
 
@@ -317,10 +455,6 @@ const Auction = () => {
                     setBidMessage(error.response.statusText)
                 })
         }
-    }
-
-    const updateBidState = (event: any) => {
-        setBid(+event.target.value)
     }
 
     const getAuctionBid = () => {
@@ -416,6 +550,62 @@ const Auction = () => {
                 fontStyle: 'italic',
                 color: 'red'}}>Reserved Not Met</h6>
         }
+    }
+
+    const updateBidState = (event: any) => {
+        setBid(+event.target.value)
+    }
+
+    const updateTitleState = (x: any) => {
+        setTitle(x)
+    }
+    const updateDescriptionState = (x: any) => {
+        setDescription(x)
+    }
+    const updateReserveState = (x: any) => {
+        setReserve(+x)
+    }
+    const updateEndDateState = (x: any) => {
+        setEndDate(x)
+    }
+    const updateCategoryIdState = (i: any) => {
+        allCategory.filter(function checkCategory(x:any) {
+            return x.categoryId === i
+        }).map((x) => setCategories(x))
+    }
+
+    const updateNewTitleState = (event: any) => {
+        if(event.target.value.length > 0) {
+            setTitleError(false);
+            setTitleHelperText("");
+            setNewTitle(event.target.value)
+        } else {
+            setTitleError(true);
+            setTitleHelperText("Please enter Title");
+        }
+    }
+
+    const updateNewDescriptionState = (event: any) => {
+        if(event.target.value.length > 0) {
+            setDescriptionError(false);
+            setDescriptionHelperText("");
+            setNewDescription(event.target.value)
+        } else {
+            setDescriptionError(true);
+            setDescriptionHelperText("Please enter Title");
+        }
+    }
+    const updateNewReserveState = (event: any) => {
+        if(reserve <= event.target.value){
+            setReserveError(false);
+            setNewReserve(+event.target.value)
+        } else {
+            setReserveError(true);
+        }
+    }
+
+    const updateNewCategoryIdState = (event: any) => {
+        setNewCategories(event.target.value)
     }
 
     const getImageDefault = (event: any) => {
@@ -704,6 +894,13 @@ const Auction = () => {
         )
     }
 
+    const textBox: CSS.Properties = {
+        width: "45%",
+        margin: "auto",
+        textAlign: 'left',
+        padding: "5px 5px"
+    }
+
     const oneThirdCell: CSS.Properties = {
         display:"inline-block",
         width: "33%",
@@ -827,9 +1024,108 @@ const Auction = () => {
                     <div style={{display:"inline-block",
                         padding: "5px"}}>
                         <Stack direction="row" spacing={2} justifyContent="right">
-                            <Button variant="contained" color="secondary" endIcon={<EditIcon/>}>
+                            <Button variant="contained" color="secondary" endIcon={<EditIcon/>} onClick={() => {handleEditDialogOpen(auction)}}>
                                 Edit
                             </Button>
+                            <Dialog
+                                open={openEditDialog}
+                                onClose={handleEditDialogClose}
+                                aria-labelledby="alert-dialog-title"
+                                aria-describedby="alert-dialog-description">
+                                <DialogTitle id="alert-dialog-title">
+                                    {"Edit Auction"}
+                                </DialogTitle>
+                                {EditAuctionFlag?
+                                    <Alert severity="error" variant="filled" >
+                                        {EditAuctionMessage}
+                                    </Alert>
+                                    :""}
+                                <DialogContent>
+                                    <h5>Select a new profile picture (optional):</h5>
+                                    <input type="file" onChange={updateImageState} accept="image/png, image/jpeg, image/gif" name="myfile"/>
+                                </DialogContent>
+                                <DialogContent style={{padding: "10px 10px"}}>
+                                    <TextField fullWidth id="outlined-multiline-flexible"
+                                               label="Title"
+                                               multiline
+                                               maxRows={2}
+                                               variant="outlined"
+                                               defaultValue={title}
+                                               helperText={TitleHelperText}
+                                               error={TitleError}
+                                               onChange={updateNewTitleState}/>
+                                </DialogContent>
+                                <DialogContent style={{padding: "10px 10px"}}>
+                                    <TextField fullWidth id="outlined-multiline-flexible"
+                                               label="Description"
+                                               multiline
+                                               maxRows={2}
+                                               variant="outlined"
+                                               defaultValue={description}
+                                               helperText={DescriptionHelperText}
+                                               error={DescriptionError}
+                                               onChange={updateNewDescriptionState}/>
+                                </DialogContent>
+                                <DialogContent style={textBox}>
+                                    <FormControl sx={{ m: 1 }}>
+                                        <InputLabel htmlFor="outlined-adornment-amount">Amount</InputLabel>
+                                        <OutlinedInput
+                                            id="outlined-adornment-amount"
+                                            defaultValue={reserve}
+                                            onChange={updateNewReserveState}
+                                            error={ReserveError}
+                                            startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                                            label="Amount"
+                                        />
+                                    </FormControl>
+                                </DialogContent>
+                                <DialogContent style={textBox}>
+                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                        <DesktopDateTimePicker
+                                            label="Pick Date and Time"
+                                            value={endDate}
+                                            onChange={(newValue) => {
+                                                setEndDate(newValue);
+                                            }}
+                                            renderInput={(params) => <TextField {...params} />}
+                                            minDateTime={new Date()}
+                                        />
+                                    </LocalizationProvider>
+                                </DialogContent>
+                                <DialogContent style={{
+                                    width: "70%",
+                                    margin: "auto",
+                                    textAlign: 'left',
+                                    padding: "5px 5px"
+                                }}>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="demo-simple-select-label">Category</InputLabel>
+                                        <Select
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            defaultValue={categories.categoryId}
+                                            label="Category"
+                                            onChange={updateNewCategoryIdState}
+                                        >
+                                            {allCategory.map((category) =>
+                                                <MenuItem value={category.categoryId}>{category.name}</MenuItem>
+                                            )}
+                                        </Select>
+                                    </FormControl>
+
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={handleEditDialogClose}>Cancel</Button>
+                                    { ReserveError !== true?
+                                        <Button variant="outlined" color="success" onClick={() => {updateAuction()}} autoFocus>
+                                            Update
+                                        </Button>:
+                                        <Button variant="outlined" color="success" disabled>
+                                            Update
+                                        </Button>
+                                    }
+                                </DialogActions>
+                            </Dialog>
                         </Stack>
                     </div>
                     <h1 style={{fontSize: "50px",
