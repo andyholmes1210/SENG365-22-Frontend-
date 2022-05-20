@@ -223,7 +223,7 @@ const Auctions = () => {
                 color: '#950101'}}> Close Today </h6>
         } if (daysBetween === 1) {
             return <h6 style={{fontSize: "15px",
-                color: '#CD5700'}}> Close Tomorrow </h6>
+                color: '#CD5700'}}> Close in {daysBetween} day </h6>
         } if (daysBetween > 1 && daysBetween < 14) {
             return <h6 style={{fontSize: "15px",
                 color: '#FEBE10'}}> Close in {daysBetween} days </h6>
@@ -278,7 +278,7 @@ const Auctions = () => {
                 display:"inline-block",
                 height: "480px",
                 width: "330px",
-                margin: "10px",
+                margin: "5px",
                 padding: "5px",
                 textAlign: "center",
                 alignContent: "center",
@@ -430,13 +430,23 @@ const Auctions = () => {
                                         />
                                     </FormControl>
                                 </DialogContent>
-                                <DialogContent style={textBox}>
+                                <DialogContent style={{ width: "60%",
+                                    margin: "auto",
+                                    textAlign: 'left',
+                                    padding: "5px 5px"}}>
                                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                                         <DesktopDateTimePicker
                                             label="Pick Date and Time"
                                             value={endDate}
                                             onChange={(newValue) => {
-                                                setEndDate(newValue);
+                                                if(new Date().toISOString().substring(0,10) === newValue!.toISOString().substring(0,10)) {
+                                                    setAuctionFlag(true)
+                                                    setAuctionMessage("Auction End date must be greater than the current date!")
+                                                } else {
+                                                    setEndDate(newValue);
+                                                    setAuctionFlag(false)
+                                                    setAuctionMessage("")
+                                                }
                                             }}
                                             renderInput={(params) => <TextField {...params} />}
                                             minDateTime={new Date()}
@@ -466,9 +476,9 @@ const Auctions = () => {
                                 </DialogContent>
                                 <DialogActions>
                                     <Button onClick={handleAddAuctionDialogClose}>Cancel</Button>
-                                    <Button variant="outlined" color="success" onClick={() => {addAuction()}} autoFocus>
-                                        Add
-                                    </Button>
+                                        <Button variant="outlined" color="success" onClick={() => {addAuction()}} autoFocus>
+                                            Add
+                                        </Button>
                                 </DialogActions>
                             </Dialog>
                             <Snackbar

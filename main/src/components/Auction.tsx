@@ -131,43 +131,10 @@ const Auction = () => {
         bidderId: 0
     }])
 
-    const [dialogBidder, setDialogBidder] = React.useState<Bid>({
-        firstName: "firstName",
-        lastName: "lastName",
-        amount: 0,
-        id: 0,
-        timestamp: new Date(),
-        auction_id: 0,
-        user_id: 0,
-        bidderId: 0
-    })
-
-    const [updateBidder, setUpdateBidder] = React.useState<Bid>({
-        firstName: "firstName",
-        lastName: "lastName",
-        amount: 0,
-        id: 0,
-        timestamp: new Date(),
-        auction_id: 0,
-        user_id: 0,
-        bidderId: 0
-    })
-
-    const handleBidderDialogOpen = (bids: Bid) => {
-        setDialogBidder(bids)
+    const handleBidderDialogOpen = () => {
         setOpenBidderDialog(true);
     };
     const handleBidderDialogClose = () => {
-        setUpdateBidder({
-            firstName: "firstName",
-            lastName: "lastName",
-            amount: 0,
-            id: 0,
-            timestamp: new Date(),
-            auction_id: 0,
-            user_id: 0,
-            bidderId: 0
-        })
         setOpenBidderDialog(false);
     };
 
@@ -226,39 +193,10 @@ const Auction = () => {
 
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false)
 
-    const [dialogAuction, setDialogAuction] = React.useState<Auctions>({
-        auctionId: -1,
-        title: "",
-        description: "",
-        reserve: 0,
-        categoryId: 0,
-        sellerId: 0,
-        sellerFirstName: "",
-        sellerLastName: "",
-        highestBid: 0,
-        numBids: 0,
-        endDate: new Date(),
-        image_filename: ""
-    })
-    const handleDeleteDialogOpen = (auction: Auctions) => {
-        setDialogAuction(auction)
+    const handleDeleteDialogOpen = () => {
         setOpenDeleteDialog(true);
     };
     const handleDeleteDialogClose = () => {
-        setDialogAuction({
-            auctionId: -1,
-            title: "",
-            description: "",
-            reserve: 0,
-            categoryId: 0,
-            sellerId: 0,
-            sellerFirstName: "",
-            sellerLastName: "",
-            highestBid: 0,
-            numBids: 0,
-            endDate: new Date(),
-            image_filename: ""
-        })
         setOpenDeleteDialog(false);
     };
 
@@ -267,43 +205,11 @@ const Auction = () => {
     const [BidFlag, setBidFlag] = React.useState(false)
     const [BidMessage, setBidMessage] = React.useState("")
 
-    const [postbid, setPostBid] = React.useState<any>({
-        firstName: "firstName",
-        lastName: "lastName",
-        amount: 0,
-        id: 0,
-        timestamp: new Date(),
-        auction_id: 0,
-        user_id: 0,
-        bidderId: 0
-    })
-    const [dialogBid, setDialogBid] = React.useState<any>({
-        firstName: "firstName",
-        lastName: "lastName",
-        amount: 0,
-        id: 0,
-        timestamp: new Date(),
-        auction_id: 0,
-        user_id: 0,
-        bidderId: 0
-    })
-
-    const handleBidDialogOpen = (x: Bid) => {
-        setDialogBid(x)
+    const handleBidDialogOpen = () => {
         setOpenBidDialog(true);
     };
 
     const handleBidDialogClose = () => {
-        setPostBid({
-            firstName: "firstName",
-            lastName: "lastName",
-            amount: 0,
-            id: 0,
-            timestamp: new Date(),
-            auction_id: 0,
-            user_id: 0,
-            bidderId: 0
-        })
         setOpenBidDialog(false);
     };
 
@@ -687,7 +593,7 @@ const Auction = () => {
                         <Button variant="contained"
                                 color="success"
                                 endIcon={<AttachMoneyIcon/>}
-                                onClick={() => handleBidDialogOpen(bids)}>
+                                onClick={handleBidDialogOpen}>
                             Place Bid
                         </Button>                           
                     }
@@ -843,7 +749,7 @@ const Auction = () => {
                     <Stack direction="row" spacing={2} justifyContent="center">
                         { auction.numBids > 0?
                             <Button variant="contained" endIcon={<AttachMoneyIcon/>}
-                                    onClick={() => handleBidderDialogOpen(bids)}>
+                                    onClick={handleBidderDialogOpen}>
                                 View Bidders
                             </Button>:
                             <Button variant="contained" endIcon={<AttachMoneyIcon/>} disabled>
@@ -909,7 +815,7 @@ const Auction = () => {
 
     const buttonStyle: CSS.Properties = {
         display:"inline-block",
-        width: "75%",
+        width: "70%",
         margin: "left",
         padding:"5px",
     }
@@ -991,11 +897,11 @@ const Auction = () => {
                     <div style={{display:"inline-block",
                         padding: "5px"}}>
                         <Stack direction="row" spacing={2} justifyContent="right">
-                            { localStorage.getItem("userId") === null || Number(localStorage.getItem("userId")) !== auction.sellerId || auction.numBids > 0?
+                            { localStorage.length === 0 || Number(localStorage.getItem("userId")) !== auction.sellerId || auction.numBids > 0?
                                 <Button variant="contained" color="error" endIcon={<DeleteIcon/>} disabled>
                                     Delete Auction
                                 </Button>:
-                                <Button variant="contained" color="error" endIcon={<DeleteIcon/>} onClick={() => {handleDeleteDialogOpen(auction)}}>
+                                <Button variant="contained" color="error" endIcon={<DeleteIcon/>} onClick={handleDeleteDialogOpen}>
                                 Delete Auction
                                 </Button>
                             }
@@ -1024,9 +930,16 @@ const Auction = () => {
                     <div style={{display:"inline-block",
                         padding: "5px"}}>
                         <Stack direction="row" spacing={2} justifyContent="right">
-                            <Button variant="contained" color="secondary" endIcon={<EditIcon/>} onClick={() => {handleEditDialogOpen(auction)}}>
-                                Edit
-                            </Button>
+                            { localStorage.length === 0 || Number(localStorage.getItem("userId")) !== auction.sellerId || auction.numBids > 0?
+                                <Button variant="contained" color="secondary" endIcon={<EditIcon/>} disabled>
+                                    Edit
+                                </Button>:
+                                <Button variant="contained" color="secondary" endIcon={<EditIcon/>} onClick={() => {handleEditDialogOpen(auction)}}>
+                                    Edit
+                                </Button>
+
+                            }
+
                             <Dialog
                                 open={openEditDialog}
                                 onClose={handleEditDialogClose}
