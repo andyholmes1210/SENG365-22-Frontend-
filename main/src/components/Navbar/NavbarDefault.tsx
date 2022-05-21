@@ -9,18 +9,18 @@ import axios from "axios";
 
 const Navbar = () => {
 
-    const navigate = useNavigate()
-    const [errorFlag, setErrorFlag] = React.useState(false)
-    const [errorMessage, setErrorMessage] = React.useState("")
+    const navigate = useNavigate();
+    const [errorFlag, setErrorFlag] = React.useState(false);
+    const [errorMessage, setErrorMessage] = React.useState("");
 
     const logoutUser = () => {
         axios.post('http://localhost:4941/api/v1/users/logout', {}, {headers: {'X-Authorization' : localStorage.getItem("auth_token")!}})
             .then(() => {
                 localStorage.clear();
-                navigate("/login")
+                navigate("/login");
             }, (error) => {
-                setErrorFlag(true)
-                setErrorMessage(error.toString())
+                setErrorFlag(true);
+                setErrorMessage(error.toString());
             })
     }
 
@@ -35,6 +35,9 @@ const Navbar = () => {
                 <NavMenu>
                     <NavLink to="/">
                         Home
+                    </NavLink>
+                    <NavLink to="/myauction">
+                        My Auction
                     </NavLink>
                     <NavLink to="/profile">
                         Profile

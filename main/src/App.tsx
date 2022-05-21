@@ -6,6 +6,7 @@ import Login from "./components/Login";
 import Auction from "./components/Auction";
 import Register from "./components/Register";
 import Profile from "./components/Profile";
+import MyAuction from "./components/MyAuction";
 function App() {
   return (
       <div className="App">
@@ -17,6 +18,7 @@ function App() {
                 <Route path="/login" element={<Login/>}/>
                 <Route path="/register" element={<Register/>}/>
                 <Route path="/profile" element={<Profile/>}/>
+                <Route path="/myauction" element={<MyAuction/>}/>
             </Routes>
           </div>
         </Router>

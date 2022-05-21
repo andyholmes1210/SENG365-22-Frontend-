@@ -1,6 +1,5 @@
 import React from "react";
 import axios from "axios";
-import {useNavigate} from 'react-router-dom';
 import CSS from 'csstype';
 import Navbar from "./Navbar/NavbarDefault";
 import {NavBottom} from "./Navbar/NavbarElement";
@@ -57,38 +56,37 @@ const Auctions = () => {
         {categoryId: 25, name: 'Cars'},
     ];
 
-    //const navigate = useNavigate()
-    const [errorFlag, setErrorFlag] = React.useState(false)
-    const [errorMessage, setErrorMessage] = React.useState("")
-    const [auctions, setAuctions] = React.useState<Array<Auctions>>([])
-    const [categories, setCategories] = React.useState<Array<Category>>([])
-    const [count, setCount] = React.useState(10)
-    const [index, setIndex] = React.useState(0)
-    const [totalpage, setTotalpage] = React.useState(0)
-    const [file, setFile] = React.useState("")
-    const [filetype, setFileType] = React.useState("")
-    const [title, setTitle] = React.useState("")
-    const [category, setCategory] = React.useState("")
+    const [errorFlag, setErrorFlag] = React.useState(false);
+    const [errorMessage, setErrorMessage] = React.useState("");
+    const [auctions, setAuctions] = React.useState<Array<Auctions>>([]);
+    const [categories, setCategories] = React.useState<Array<Category>>([]);
+    const [count, setCount] = React.useState(10);
+    const [index, setIndex] = React.useState(0);
+    const [totalpage, setTotalpage] = React.useState(0);
+    const [file, setFile] = React.useState("");
+    const [filetype, setFileType] = React.useState("");
+    const [title, setTitle] = React.useState("");
+    const [category, setCategory] = React.useState("");
     const [endDate, setEndDate] = React.useState<Date | null>(new Date());
-    const [description, setDescription] = React.useState("")
-    const [reservePrice, setReservePrice] = React.useState(1)
-    const [AuctionFlag, setAuctionFlag] = React.useState(false)
-    const [AuctionMessage, setAuctionMessage] = React.useState("")
+    const [description, setDescription] = React.useState("");
+    const [reservePrice, setReservePrice] = React.useState(1);
+    const [AuctionFlag, setAuctionFlag] = React.useState(false);
+    const [AuctionMessage, setAuctionMessage] = React.useState("");
 
-    const [openAddAuctionDialog, setOpenAddAuctionDialog] = React.useState(false)
+    const [openAddAuctionDialog, setOpenAddAuctionDialog] = React.useState(false);
     const [AddAuction, setAddAction] = React.useState<any>({title:"",
         description:"",
         categotyId:"",
         endDate: new Date(),
-        reserve: 0})
+        reserve: 0});
     const [dialogAddAuction, setDialogAddAuction] = React.useState<any>({title:"",
         description:"",
         categotyId:"",
         endDate: new Date(),
-        reserve: 0})
+        reserve: 0});
 
     const handleAddAuctionDialogOpen = (addAuction: any) => {
-        setDialogAddAuction(addAuction)
+        setDialogAddAuction(addAuction);
         setOpenAddAuctionDialog(true);
     };
 
@@ -101,8 +99,8 @@ const Auctions = () => {
         setOpenAddAuctionDialog(false);
     };
 
-    const [snackOpen, setSnackOpen] = React.useState(false)
-    const [snackMessage, setSnackMessage] = React.useState("")
+    const [snackOpen, setSnackOpen] = React.useState(false);
+    const [snackMessage, setSnackMessage] = React.useState("");
     const handleSnackClose = (event?: React.SyntheticEvent | Event,
                               reason?: string) => {
         if (reason === 'clickaway') {
@@ -112,47 +110,47 @@ const Auctions = () => {
     };
 
     const paginationPage = (event: React.ChangeEvent<unknown>, value: number) => {
-        setIndex((value * count) - count)
-        getAuctions()
+        setIndex((value * count) - count);
+        getAuctions();
     }
 
     React.useEffect(() => {
-        getAuctions()
-        getCategory()
-    },[index, count, totalpage])
+        getAuctions();
+        getCategory();
+    },[index, count, totalpage]);
 
     const getAuctions = () => {
         axios.get('http://localhost:4941/api/v1/auctions?count=' + count + "&startIndex=" + index)
             .then((response) => {
-                setErrorFlag(false)
-                setErrorMessage("")
-                setAuctions(response.data.auctions)
-                setTotalpage(Math.round(response.data.count/count))
+                setErrorFlag(false);
+                setErrorMessage("");
+                setAuctions(response.data.auctions);
+                setTotalpage(Math.round(response.data.count/count));
             }, (error) => {
-                setErrorFlag(true)
-                setErrorMessage(error.toString())
+                setErrorFlag(true);
+                setErrorMessage(error.toString());
             })
-    }
+    };
 
     const addAuction = () => {
         if(file === "") {
-            setAuctionFlag(true)
-            setAuctionMessage("Must Provide a Photo of the Auction!")
+            setAuctionFlag(true);
+            setAuctionMessage("Must Provide a Photo of the Auction!");
         } else if(title === ""){
-            setAuctionFlag(true)
-            setAuctionMessage("Must Provide a Title!")
+            setAuctionFlag(true);
+            setAuctionMessage("Must Provide a Title!");
         } else if (description === ""){
-            setAuctionFlag(true)
-            setAuctionMessage("Must Provide a Description!")
+            setAuctionFlag(true);
+            setAuctionMessage("Must Provide a Description!");
         } else if (reservePrice < 1){
-            setAuctionFlag(true)
-            setAuctionMessage("Reserve Price must be 1 or higher!")
-        } else if (endDate === null || endDate < new Date()){
-            setAuctionFlag(true)
-            setAuctionMessage("Must Provide an End Date!")
+            setAuctionFlag(true);
+            setAuctionMessage("Reserve Price must be 1 or higher!");
+        } else if (endDate === null || endDate <= new Date()){
+            setAuctionFlag(true);
+            setAuctionMessage("Must Provide an End Date!");
         } else if (category === ""){
-            setAuctionFlag(true)
-            setAuctionMessage("Must Provide a Category!")
+            setAuctionFlag(true);
+            setAuctionMessage("Must Provide a Category!");
         } else {
             axios.post('http://localhost:4941/api/v1/auctions', {
                     "title": title,
@@ -163,34 +161,34 @@ const Auctions = () => {
                 {headers:
                         {'X-Authorization': localStorage.getItem("auth_token")!}})
                 .then((response) => {
-                    uploadAuctionPic(response.data.auctionId)
-                    getAuctions()
-                    window.location.href = window.location.href
-                    setSnackMessage("Add Auction successfully")
+                    uploadAuctionPic(response.data.auctionId);
+                    getAuctions();
+                    window.location.href = window.location.href;
+                    setSnackMessage("Add Auction successfully");
                     setSnackOpen(true)
                 }, (error) => {
-                    setAuctionFlag(true)
-                    setAuctionMessage(error.response.statusText)
+                    setAuctionFlag(true);
+                    setAuctionMessage(error.response.statusText);
                 })
         }
-    }
+    };
 
     const getCategory = () => {
         axios.get('http://localhost:4941/api/v1/auctions/categories')
             .then((response) => {
-                setErrorFlag(false)
-                setErrorMessage("")
-                setCategories(response.data)
+                setErrorFlag(false);
+                setErrorMessage("");
+                setCategories(response.data);
             }, (error) => {
-                setErrorFlag(true)
-                setErrorMessage(error.toString())
+                setErrorFlag(true);
+                setErrorMessage(error.toString());
             })
-    }
+    };
 
     const updateImageState = (event: any) => {
-        setFile(event.target.files[0])
-        setFileType(event.target.files[0].type)
-    }
+        setFile(event.target.files[0]);
+        setFileType(event.target.files[0].type);
+    };
 
     const uploadAuctionPic = (id: any) => {
             axios.put('http://localhost:4941/api/v1/auctions/' + id + '/image', file, {
@@ -200,77 +198,77 @@ const Auctions = () => {
             })
                 .then(()=>{
                 }, () => {
-                    setErrorFlag(true)
-                    setErrorMessage("Image must be jpg/gif/png")
+                    setErrorFlag(true);
+                    setErrorMessage("Image must be jpg/gif/png");
                 })
-    }
+    };
 
     const checkNull = (x: any) => {
         if(x === null){
-            return 0
+            return 0;
         } else {
-            return x
+            return x;
         }
-    }
+    };
 
     const checkDate = (x: any) => {
-        const daysBetween: number = (Math.trunc((new Date(x).getTime() - new Date().getTime())/(86400 * 1000)))
+        const daysBetween: number = (Math.trunc((new Date(x).getTime() - new Date().getTime())/(86400 * 1000)));
         if (daysBetween < 0) {
             return <h6 style={{fontSize: "15px",
-                color: '#FF0000'}}> Auction End </h6>
+                color: '#FF0000'}}> Auction End </h6>;
         } if (daysBetween === 0) {
             return <h6 style={{fontSize: "15px",
-                color: '#950101'}}> Close Today </h6>
+                color: '#950101'}}> Close Today </h6>;
         } if (daysBetween === 1) {
             return <h6 style={{fontSize: "15px",
-                color: '#CD5700'}}> Close in {daysBetween} day </h6>
+                color: '#CD5700'}}> Close in {daysBetween} day </h6>;
         } if (daysBetween > 1 && daysBetween < 14) {
             return <h6 style={{fontSize: "15px",
-                color: '#FEBE10'}}> Close in {daysBetween} days </h6>
+                color: '#FEBE10'}}> Close in {daysBetween} days </h6>;
         } if (daysBetween >= 14) {
             return <h6 style={{fontSize: "15px",
-                color: '#006400'}}> Close in {daysBetween} days </h6>
+                color: '#006400'}}> Close in {daysBetween} days </h6>;
         }
-    }
+    };
 
     const checkReserve = (x: any) => {
         if(x.highestBid >= x.reserve) {
             return <h6 style={{fontSize: "12px",
                 textAlign: "center",
                 fontStyle: 'italic',
-                color: 'green'}}>Reserved Met</h6>
+                color: 'green'}}>Reserved Met</h6>;
         } else {
             return <h6 style={{fontSize: "12px",
                 textAlign: "center",
                 fontStyle: 'italic',
-                color: 'red'}}>Reserved Not Met</h6>
+                color: 'red'}}>Reserved Not Met</h6>;
         }
-    }
+    };
 
     const updateTitleState = (event: any) => {
-        setTitle(event.target.value)
-    }
+        setTitle(event.target.value);
+    };
 
     const updateDescriptionState = (event: any) => {
-        setDescription(event.target.value)
-    }
+        setDescription(event.target.value);
+    };
 
     const updateReserveState = (event: any) => {
-        setReservePrice(+event.target.value)
-    }
+        setReservePrice(+event.target.value);
+    };
 
 
     const updateCategoryState = (event: any) => {
-        setCategory(event.target.value)
-    }
+        setCategory(event.target.value);
+    };
 
     const getImageDefault = (event: any) => {
-        event.target.src = "https://icon-library.com/images/default-profile-icon/default-profile-icon-24.jpg"
-    }
+        event.target.src = "https://icon-library.com/images/default-profile-icon/default-profile-icon-24.jpg";
+    };
 
     const getAuctionDefault = (event: any) => {
-        event.target.src = "https://atasouthport.com/wp-content/uploads/2017/04/default-image.jpg"
-    }
+        event.target.src = "https://atasouthport.com/wp-content/uploads/2017/04/default-image.jpg";
+    };
 
     const auction_rows = () => {
         return (auctions.map((row) =>
@@ -347,7 +345,7 @@ const Auctions = () => {
             </Paper>
             )
         )
-    }
+    };
 
     const card: CSS.Properties = {
         padding: "10px",
@@ -357,14 +355,14 @@ const Auctions = () => {
         width: "80%",
         backgroundColor: '#261C2C',
         borderRadius: "15px"
-    }
+    };
 
     const textBox: CSS.Properties = {
         width: "45%",
         margin: "auto",
         textAlign: 'left',
         padding: "5px 5px"
-    }
+    };
 
     return (
         <div>

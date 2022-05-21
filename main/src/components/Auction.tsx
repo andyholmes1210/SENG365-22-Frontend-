@@ -54,42 +54,42 @@ const Auction = () => {
     ];
 
     let {id} = useParams();
-    const navigate = useNavigate()
-    const [errorFlag, setErrorFlag] = React.useState(false)
-    const [errorMessage, setErrorMessage] = React.useState("")
-    const [openBidderDialog, setOpenBidderDialog] = React.useState(false)
-    const [openSimilarAuctionDialog, setOpenSimilarAuctionDialog] = React.useState(false)
-    const [category, setCategory] = React.useState<Array<Category>>([])
-    const [highestBidderId, sethighestBidderId] = React.useState(0)
-    const [highestFirstnameBidder, sethighestFirstnameBidder] = React.useState("")
-    const [highestLastnameBidder, sethighestLastnameBidder] = React.useState("")
+    const navigate = useNavigate();
+    const [errorFlag, setErrorFlag] = React.useState(false);
+    const [errorMessage, setErrorMessage] = React.useState("");
+    const [openBidderDialog, setOpenBidderDialog] = React.useState(false);
+    const [openSimilarAuctionDialog, setOpenSimilarAuctionDialog] = React.useState(false);
+    const [category, setCategory] = React.useState<Array<Category>>([]);
+    const [highestBidderId, sethighestBidderId] = React.useState(0);
+    const [highestFirstnameBidder, sethighestFirstnameBidder] = React.useState("");
+    const [highestLastnameBidder, sethighestLastnameBidder] = React.useState("");
 
-    const [file, setFile] = React.useState("")
-    const [filetype, setFileType] = React.useState("")
-    const [userImage, setUserImage] = React.useState(null)
+    const [file, setFile] = React.useState("");
+    const [filetype, setFileType] = React.useState("");
+    const [userImage, setUserImage] = React.useState(null);
 
-    const [title, setTitle] = React.useState("")
-    const [newTitle, setNewTitle] = React.useState("")
-    const [TitleError, setTitleError] = React.useState(false)
-    const [TitleHelperText, setTitleHelperText] = React.useState("")
+    const [title, setTitle] = React.useState("");
+    const [newTitle, setNewTitle] = React.useState("");
+    const [TitleError, setTitleError] = React.useState(false);
+    const [TitleHelperText, setTitleHelperText] = React.useState("");
 
-    const [description, setDescription] = React.useState("")
-    const [newDescription, setNewDescription] = React.useState("")
-    const [DescriptionError, setDescriptionError] = React.useState(false)
-    const [DescriptionHelperText, setDescriptionHelperText] = React.useState("")
+    const [description, setDescription] = React.useState("");
+    const [newDescription, setNewDescription] = React.useState("");
+    const [DescriptionError, setDescriptionError] = React.useState(false);
+    const [DescriptionHelperText, setDescriptionHelperText] = React.useState("");
 
-    const [categories, setCategories] = React.useState<any>({})
-    const [newCategories, setNewCategories] = React.useState("")
+    const [categories, setCategories] = React.useState<any>({});
+    const [newCategories, setNewCategories] = React.useState("");
 
-    const [endDate, setEndDate] = React.useState<Date | any>(new Date())
-    const [newEndDate, setNewEndDate] = React.useState<Date | any>(new Date())
+    const [endDate, setEndDate] = React.useState<Date | any>(new Date());
+    const [newEndDate, setNewEndDate] = React.useState<Date | any>(new Date());
 
-    const [reserve, setReserve] = React.useState(0)
-    const [newReserve, setNewReserve] = React.useState(0)
-    const [ReserveError, setReserveError] = React.useState(false)
+    const [reserve, setReserve] = React.useState(0);
+    const [newReserve, setNewReserve] = React.useState(0);
+    const [ReserveError, setReserveError] = React.useState(false);
 
-    const [EditAuctionFlag, setEditAuctionFlag] = React.useState(false)
-    const [EditAuctionMessage, setEditAuctionMessage] = React.useState("")
+    const [EditAuctionFlag, setEditAuctionFlag] = React.useState(false);
+    const [EditAuctionMessage, setEditAuctionMessage] = React.useState("");
 
     const [similarauction, setSimilarAuction] = React.useState<Array<any>>([{
         auctionId: 0,
@@ -104,7 +104,7 @@ const Auction = () => {
         numBids: 0,
         endDate: new Date(),
         image_filename: ""
-    }])
+    }]);
     const [auction, setAuction] = React.useState<Auctions>({
         auctionId: 0,
         title: "",
@@ -118,7 +118,7 @@ const Auction = () => {
         numBids: 0,
         endDate: new Date(),
         image_filename: ""
-    })
+    });
 
     const [bids, setBids] = React.useState<Array<Bid>>([{
         firstName: "firstName",
@@ -129,7 +129,7 @@ const Auction = () => {
         auction_id: 0,
         user_id: 0,
         bidderId: 0
-    }])
+    }]);
 
     const handleBidderDialogOpen = () => {
         setOpenBidderDialog(true);
@@ -151,7 +151,7 @@ const Auction = () => {
         numBids: 0,
         endDate: new Date(),
         image_filename: ""
-    })
+    });
 
     const [updateSimilarAuction, setupdateSimilarAuction] = React.useState<Auctions>({
         auctionId: 0,
@@ -166,12 +166,12 @@ const Auction = () => {
         numBids: 0,
         endDate: new Date(),
         image_filename: ""
-    })
+    });
 
     const handleSimilarAuctionOpen = (similarauction: Auctions) => {
-        setdialogSimilarAuction(similarauction)
-        setOpenSimilarAuctionDialog(true)
-    }
+        setdialogSimilarAuction(similarauction);
+        setOpenSimilarAuctionDialog(true);
+    };
 
     const handleSimilarAuctionClose = () => {
         setupdateSimilarAuction({
@@ -187,11 +187,11 @@ const Auction = () => {
             numBids: 0,
             endDate: new Date(),
             image_filename: ""
-        })
+        });
         setOpenSimilarAuctionDialog(false);
-    }
+    };
 
-    const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false)
+    const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
 
     const handleDeleteDialogOpen = () => {
         setOpenDeleteDialog(true);
@@ -200,10 +200,10 @@ const Auction = () => {
         setOpenDeleteDialog(false);
     };
 
-    const [bid, setBid] = React.useState(0)
-    const [openBidDialog, setOpenBidDialog] = React.useState(false)
-    const [BidFlag, setBidFlag] = React.useState(false)
-    const [BidMessage, setBidMessage] = React.useState("")
+    const [bid, setBid] = React.useState(0);
+    const [openBidDialog, setOpenBidDialog] = React.useState(false);
+    const [BidFlag, setBidFlag] = React.useState(false);
+    const [BidMessage, setBidMessage] = React.useState("");
 
     const handleBidDialogOpen = () => {
         setOpenBidDialog(true);
@@ -213,19 +213,19 @@ const Auction = () => {
         setOpenBidDialog(false);
     };
 
-    const [openEditDialog, setOpenEditDialog] = React.useState(false)
+    const [openEditDialog, setOpenEditDialog] = React.useState(false);
     const [editAuction, setEditAuction] = React.useState<any>({title:"",
         description:"",
         endDate:"",
         reserve:0,
-        categoryId:""})
+        categoryId:""});
     const [dialogEditAuction, setDialogEditAuction] = React.useState<any>({title:"",
         description:"",
         endDate:"",
         reserve:0,
-        categoryId:""})
+        categoryId:""});
     const handleEditDialogOpen = (auction: any) => {
-        setDialogEditAuction(auction)
+        setDialogEditAuction(auction);
         setOpenEditDialog(true);
     };
 
@@ -234,12 +234,12 @@ const Auction = () => {
             description:"",
             endDate:"",
             reserve:0,
-            categoryId:""})
+            categoryId:""});
         setOpenEditDialog(false);
     };
 
-    const [snackOpen, setSnackOpen] = React.useState(false)
-    const [snackMessage, setSnackMessage] = React.useState("")
+    const [snackOpen, setSnackOpen] = React.useState(false);
+    const [snackMessage, setSnackMessage] = React.useState("");
     const handleSnackClose = (event?: React.SyntheticEvent | Event,
                               reason?: string) => {
         if (reason === 'clickaway') {
@@ -249,51 +249,51 @@ const Auction = () => {
     };
 
     React.useEffect(() => {
-        getOneAuction()
-        getCategory()
-        getAuctionBid()
-    }, [highestBidderId, highestFirstnameBidder, highestLastnameBidder, id])
+        getOneAuction();
+        getCategory();
+        getAuctionBid();
+    }, [highestBidderId, highestFirstnameBidder, highestLastnameBidder, id]);
 
     const getOneAuction = () => {
         axios.get('http://localhost:4941/api/v1/auctions/' + id)
             .then((response) => {
-                setErrorFlag(false)
-                setErrorMessage("")
-                setAuction(response.data)
-                getSimilarAuction(response.data.categoryId)
-                updateTitleState(response.data.title)
-                updateDescriptionState(response.data.description)
-                updateReserveState(response.data.reserve)
-                updateCategoryIdState(response.data.categoryId)
-                updateEndDateState(response.data.endDate)
+                setErrorFlag(false);
+                setErrorMessage("");
+                setAuction(response.data);
+                getSimilarAuction(response.data.categoryId);
+                updateTitleState(response.data.title);
+                updateDescriptionState(response.data.description);
+                updateReserveState(response.data.reserve);
+                updateCategoryIdState(response.data.categoryId);
+                updateEndDateState(response.data.endDate);
             }, (error) => {
-                setErrorFlag(true)
-                setErrorMessage(error.toString())
+                setErrorFlag(true);
+                setErrorMessage(error.toString());
             })
-    }
+    };
 
     const deleteAuction = () => {
         axios.delete('http://localhost:4941/api/v1/auctions/' + id, {headers:
                 {'X-Authorization': localStorage.getItem("auth_token")!}})
             .then(() => {
-                handleDeleteDialogClose()
+                handleDeleteDialogClose();
                 navigate("/")
             }, (error) => {
-                setErrorFlag(true)
-                setErrorMessage(error.toString())
+                setErrorFlag(true);
+                setErrorMessage(error.toString());
             })
-    }
+    };
 
     const updateAuction = () => {
         if (endDate === null || endDate < new Date()){
-            setEditAuctionFlag(true)
-            setEditAuctionMessage("Must Provide an End Date!")
+            setEditAuctionFlag(true);
+            setEditAuctionMessage("Must Provide an End Date!");
         } else if(title === ""){
-            setEditAuctionFlag(true)
-            setEditAuctionMessage("Must Provide a Title!")
+            setEditAuctionFlag(true);
+            setEditAuctionMessage("Must Provide a Title!");
         } else if (description === ""){
-            setEditAuctionFlag(true)
-            setEditAuctionMessage("Must Provide a Description!")
+            setEditAuctionFlag(true);
+            setEditAuctionMessage("Must Provide a Description!");
         } else {
             axios.patch('http://localhost:4941/api/v1/auctions/' + id, {
                     "title": newTitle,
@@ -305,21 +305,20 @@ const Auction = () => {
                 {headers: {'X-Authorization' : localStorage.getItem("auth_token")!}})
                 .then(() => {
                     if (file !== '') {
-                        uploadAuctionPic()
+                        uploadAuctionPic();
                     }
-                    getOneAuction()
+                    getOneAuction();
                 }, (error) => {
-                    setErrorFlag(true)
-                    setErrorMessage(error.toString())
+                    setErrorFlag(true);
+                    setErrorMessage(error.toString());
                 })
         }
-
-    }
+    };
 
     const updateImageState = (event: any) => {
-        setFile(event.target.files[0])
-        setFileType(event.target.files[0].type)
-    }
+        setFile(event.target.files[0]);
+        setFileType(event.target.files[0].type);
+    };
 
     const uploadAuctionPic = () => {
         axios.put('http://localhost:4941/api/v1/auctions/' + id + '/image', file, {
@@ -329,21 +328,21 @@ const Auction = () => {
         })
             .then(()=>{
             }, () => {
-                setErrorFlag(true)
-                setErrorMessage("Image must be jpg/gif/png")
+                setErrorFlag(true);
+                setErrorMessage("Image must be jpg/gif/png");
             })
-    }
+    };
 
     const postBid = () => {
         if (bid <= 0) {
-            setBidFlag(true)
-            setBidMessage("Bid must be more than 0!")
+            setBidFlag(true);
+            setBidMessage("Bid must be more than 0!");
         } else if (bid <= auction.highestBid) {
-            setBidFlag(true)
-            setBidMessage("Bid must be more than the highest bid!")
+            setBidFlag(true);
+            setBidMessage("Bid must be more than the highest bid!");
         } else if (auction.sellerId === Number(localStorage.getItem("userId")!)) {
-            setBidFlag(true)
-            setBidMessage("Can't Place bid on your own Auction!")
+            setBidFlag(true);
+            setBidMessage("Can't Place bid on your own Auction!");
         } else {
             axios.post('http://localhost:4941/api/v1/auctions/' + id + '/bids', {"amount": Number(bid)},
                 {
@@ -351,176 +350,176 @@ const Auction = () => {
                         {'X-Authorization': localStorage.getItem("auth_token")!}
                 })
                 .then(() => {
-                    handleBidDialogClose()
-                    setSnackMessage("Bid place successfully")
-                    setSnackOpen(true)
-                    getOneAuction()
-                    getAuctionBid()
+                    handleBidDialogClose();
+                    setSnackMessage("Bid place successfully");
+                    setSnackOpen(true);
+                    getOneAuction();
+                    getAuctionBid();
                 }, (error) => {
-                    setBidFlag(true)
-                    setBidMessage(error.response.statusText)
+                    setBidFlag(true);
+                    setBidMessage(error.response.statusText);
                 })
         }
-    }
+    };
 
     const getAuctionBid = () => {
         axios.get('http://localhost:4941/api/v1/auctions/' + id + '/bids')
             .then((response) => {
-                setErrorFlag(false)
-                setErrorMessage("")
-                setBids(response.data)
-                sethighestBidderId(response.data[0].bidderId)
-                sethighestFirstnameBidder(response.data[0].firstName)
-                sethighestLastnameBidder(response.data[0].lastName)
+                setErrorFlag(false);
+                setErrorMessage("");
+                setBids(response.data);
+                sethighestBidderId(response.data[0].bidderId);
+                sethighestFirstnameBidder(response.data[0].firstName);
+                sethighestLastnameBidder(response.data[0].lastName);
             }, (error) => {
-                setErrorFlag(true)
-                setErrorMessage(error.toString())
+                setErrorFlag(true);
+                setErrorMessage(error.toString());
             })
-    }
+    };
 
     const getSimilarAuction = (id: number) => {
         axios.get('http://localhost:4941/api/v1/auctions?categoryIds=' + id)
             .then((response) => {
-                setErrorFlag(false)
-                setErrorMessage("")
-                setSimilarAuction(response.data.auctions)
+                setErrorFlag(false);
+                setErrorMessage("");
+                setSimilarAuction(response.data.auctions);
             }, (error) => {
-                setErrorFlag(true)
-                setErrorMessage(error.toString())
+                setErrorFlag(true);
+                setErrorMessage(error.toString());
             })
-    }
+    };
 
     const getCategory = () => {
         axios.get('http://localhost:4941/api/v1/auctions/categories')
             .then((response) => {
-                setErrorFlag(false)
-                setErrorMessage("")
-                setCategory(response.data)
+                setErrorFlag(false);
+                setErrorMessage("");
+                setCategory(response.data);
             }, (error) => {
-                setErrorFlag(true)
-                setErrorMessage(error.toString())
+                setErrorFlag(true);
+                setErrorMessage(error.toString());
             })
-    }
+    };
 
     const checkCategory = (x: number) => {
-        let name = ""
+        let name = "";
         for(let i = 0; i < category.length; i++) {
             if(x === category[i].categoryId){
-                name = category[i].name
-                return name
+                name = category[i].name;
+                return name;
             }
         }
-    }
+    };
 
     const changeDate = (x: string) => {
-        return new Date(x).toLocaleString()
-    }
+        return new Date(x).toLocaleString();
+    };
 
     const checkNull = (x: any) => {
         if(x === null){
-            return 0
+            return 0;
         } else {
-            return x
+            return x;
         }
-    }
+    };
 
     const checkDate = (x: any) => {
-        const daysBetween: number = (Math.trunc((new Date(x).getTime() - new Date().getTime())/(86400 * 1000)))
+        const daysBetween: number = (Math.trunc((new Date(x).getTime() - new Date().getTime())/(86400 * 1000)));
         if (daysBetween < 0) {
             return <h6 style={{fontSize: "12px",
-                color: '#58111A'}}> Auction End </h6>
+                color: '#58111A'}}> Auction End </h6>;
         } if (daysBetween === 0) {
             return <h6 style={{fontSize: "12px",
-                color: '#FF0800'}}> Close Today </h6>
+                color: '#FF0800'}}> Close Today </h6>;
         } if (daysBetween === 1) {
             return <h6 style={{fontSize: "12px",
-                color: '#CD5700'}}> Close Tomorrow </h6>
+                color: '#CD5700'}}> Close Tomorrow </h6>;
         } if (daysBetween > 1 && daysBetween < 14) {
             return <h6 style={{fontSize: "12px",
-                color: '#FEBE10'}}> Close in {daysBetween} days </h6>
+                color: '#FEBE10'}}> Close in {daysBetween} days </h6>;
         } if (daysBetween >= 14) {
             return <h6 style={{fontSize: "12px",
-                color: '#006400'}}> Close in {daysBetween} days </h6>
+                color: '#006400'}}> Close in {daysBetween} days </h6>;
         }
-    }
+    };
 
     const checkReserve = (x: any) => {
         if(x.highestBid >= x.reserve) {
             return <h6 style={{fontSize: "25px",
                 textAlign: "center",
                 fontStyle: 'italic',
-                color: 'green'}}>Reserved Met</h6>
+                color: 'green'}}>Reserved Met</h6>;
         } else {
             return <h6 style={{fontSize: "25px",
                 textAlign: "center",
                 fontStyle: 'italic',
-                color: 'red'}}>Reserved Not Met</h6>
+                color: 'red'}}>Reserved Not Met</h6>;
         }
-    }
+    };
 
     const updateBidState = (event: any) => {
-        setBid(+event.target.value)
-    }
+        setBid(+event.target.value);
+    };
 
     const updateTitleState = (x: any) => {
-        setTitle(x)
-    }
+        setTitle(x);
+    };
     const updateDescriptionState = (x: any) => {
-        setDescription(x)
-    }
+        setDescription(x);
+    };
     const updateReserveState = (x: any) => {
-        setReserve(+x)
-    }
+        setReserve(+x);
+    };
     const updateEndDateState = (x: any) => {
-        setEndDate(x)
-    }
+        setEndDate(x);
+    };
     const updateCategoryIdState = (i: any) => {
         allCategory.filter(function checkCategory(x:any) {
-            return x.categoryId === i
+            return x.categoryId === i;
         }).map((x) => setCategories(x))
-    }
+    };
 
     const updateNewTitleState = (event: any) => {
         if(event.target.value.length > 0) {
             setTitleError(false);
             setTitleHelperText("");
-            setNewTitle(event.target.value)
+            setNewTitle(event.target.value);
         } else {
             setTitleError(true);
             setTitleHelperText("Please enter Title");
         }
-    }
+    };
 
     const updateNewDescriptionState = (event: any) => {
         if(event.target.value.length > 0) {
             setDescriptionError(false);
             setDescriptionHelperText("");
-            setNewDescription(event.target.value)
+            setNewDescription(event.target.value);
         } else {
             setDescriptionError(true);
             setDescriptionHelperText("Please enter Title");
         }
-    }
+    };
     const updateNewReserveState = (event: any) => {
         if(reserve <= event.target.value){
             setReserveError(false);
-            setNewReserve(+event.target.value)
+            setNewReserve(+event.target.value);
         } else {
             setReserveError(true);
         }
-    }
+    };
 
     const updateNewCategoryIdState = (event: any) => {
-        setNewCategories(event.target.value)
-    }
+        setNewCategories(event.target.value);
+    };
 
     const getImageDefault = (event: any) => {
-        event.target.src = "https://icon-library.com/images/default-profile-icon/default-profile-icon-24.jpg"
-    }
+        event.target.src = "https://icon-library.com/images/default-profile-icon/default-profile-icon-24.jpg";
+    };
 
     const getAuctionDefault = (event: any) => {
-        event.target.src = "https://atasouthport.com/wp-content/uploads/2017/04/default-image.jpg"
-    }
+        event.target.src = "https://atasouthport.com/wp-content/uploads/2017/04/default-image.jpg";
+    };
 
     const get_similarauctions_rows = () => {
         return (similarauction.filter(similarauction => similarauction.auctionId !== auction.auctionId).map((row) =>
@@ -542,7 +541,7 @@ const Auction = () => {
                 </TableRow>
             )
         )
-    }
+    };
 
     const get_bidders_rows = () => {
         return (bids.map((row) =>
@@ -560,7 +559,7 @@ const Auction = () => {
                 </TableRow>
             )
         )
-    }
+    };
 
     const auction_detail_rows = (auction: any, bids: any, similarauction: any) => {
         return (
@@ -798,48 +797,48 @@ const Auction = () => {
                 </div>
             </Paper>
         )
-    }
+    };
 
     const textBox: CSS.Properties = {
         width: "45%",
         margin: "auto",
         textAlign: 'left',
         padding: "5px 5px"
-    }
+    };
 
     const oneThirdCell: CSS.Properties = {
         display:"inline-block",
         width: "33%",
         padding: "5px",
-    }
+    };
 
     const buttonStyle: CSS.Properties = {
         display:"inline-block",
         width: "70%",
         margin: "left",
         padding:"5px",
-    }
+    };
 
     const halfCell: CSS.Properties = {
         display:"inline-block",
         width: "50%",
         padding:"5px",
         textAlign: "center"
-    }
+    };
 
     const halfCell1: CSS.Properties = {
         display:"inline-block",
         width: "50%",
         padding:"5px",
         textAlign: "center"
-    }
+    };
 
     const headingCenDialog: CSS.Properties = {
         fontWeight: 'bold',
         textDecorationLine: 'underline',
         textAlign:"center",
         fontSize: "12px",
-    }
+    };
 
     const headingCen: CSS.Properties = {
         fontWeight: 'bold',
@@ -847,20 +846,20 @@ const Auction = () => {
         textAlign:"center",
         fontSize: "12px",
         color: '#fff'
-    }
+    };
 
     const textCen: CSS.Properties = {
         textAlign:"center",
         fontSize: "16px",
         color: '#fff'
-    }
+    };
 
     const headingLeft: CSS.Properties = {
         fontWeight: 'bold',
         textDecorationLine: 'underline',
         textAlign:"left",
         color: '#fff'
-    }
+    };
 
     const card: CSS.Properties = {
         padding: "10px",
@@ -870,7 +869,7 @@ const Auction = () => {
         borderRadius: "15px",
         marginTop: "1%",
         marginBottom: "1%"
-    }
+    };
 
     const cardDiv: CSS.Properties = {
         padding: "10px",
@@ -880,7 +879,7 @@ const Auction = () => {
         backgroundColor: '#5C527F',
         borderRadius: "15px",
         marginBottom: "15px"
-    }
+    };
 
     return (
         <div>

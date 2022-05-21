@@ -13,7 +13,6 @@ import React from "react";
 import axios from "axios";
 import Navbar from "./Navbar/NavbarDefault";
 import EditIcon from "@mui/icons-material/Edit";
-import ArticleIcon from '@mui/icons-material/Article';
 import {NavBottom} from "./Navbar/NavbarElement";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -26,37 +25,37 @@ const Profile = () => {
         showPassword: boolean;
     }
 
-    const [file, setFile] = React.useState("")
-    const [filetype, setFileType] = React.useState("")
-    const [userImage, setUserImage] = React.useState(null)
+    const [file, setFile] = React.useState("");
+    const [filetype, setFileType] = React.useState("");
+    const [userImage, setUserImage] = React.useState(null);
 
-    const [loginFlag, setLoginFlag] = React.useState(false)
-    const [loginMessage, setLoginMessage] = React.useState("")
+    const [loginFlag, setLoginFlag] = React.useState(false);
+    const [loginMessage, setLoginMessage] = React.useState("");
 
-    const [errorFlag, setErrorFlag] = React.useState(false)
-    const [errorMessage, setErrorMessage] = React.useState("")
-    const [editFlag, setEditFlag] = React.useState(false)
-    const [editMessage, setEditMessage] = React.useState("")
-    const [userDetails, setUserDetails] = React.useState<Array<any>>([])
+    const [errorFlag, setErrorFlag] = React.useState(false);
+    const [errorMessage, setErrorMessage] = React.useState("");
+    const [editFlag, setEditFlag] = React.useState(false);
+    const [editMessage, setEditMessage] = React.useState("");
+    const [userDetails, setUserDetails] = React.useState<Array<any>>([]);
 
-    const [firstname, setFirstname] = React.useState("")
-    const [lastname, setLastName] = React.useState("")
-    const [email, setEmail] = React.useState("")
+    const [firstname, setFirstname] = React.useState("");
+    const [lastname, setLastName] = React.useState("");
+    const [email, setEmail] = React.useState("");
 
-    const [newfirstname, setNewFirstname] = React.useState("")
-    const [firstnameerror, setFirstNameError] = React.useState(false)
-    const [firstnamehelpertext, setFirstNameHelperText] = React.useState("")
+    const [newfirstname, setNewFirstname] = React.useState("");
+    const [firstnameerror, setFirstNameError] = React.useState(false);
+    const [firstnamehelpertext, setFirstNameHelperText] = React.useState("");
 
-    const [newlastname, setNewLastName] = React.useState("")
-    const [lastnameerror, setLastNameError] = React.useState(false)
-    const [lastnamehelpertext, setLastNameHelperText] = React.useState("")
+    const [newlastname, setNewLastName] = React.useState("");
+    const [lastnameerror, setLastNameError] = React.useState(false);
+    const [lastnamehelpertext, setLastNameHelperText] = React.useState("");
 
-    const [newemail, setNewEmail] = React.useState("")
-    const [emailerror, setEmailError] = React.useState(false)
-    const [emailhelpertext, setEmailHelperText] = React.useState("")
+    const [newemail, setNewEmail] = React.useState("");
+    const [emailerror, setEmailError] = React.useState(false);
+    const [emailhelpertext, setEmailHelperText] = React.useState("");
 
-    const [snackOpen, setSnackOpen] = React.useState(false)
-    const [snackMessage, setSnackMessage] = React.useState("")
+    const [snackOpen, setSnackOpen] = React.useState(false);
+    const [snackMessage, setSnackMessage] = React.useState("");
     const handleSnackClose = (event?: React.SyntheticEvent | Event,
                               reason?: string) => {
         if (reason === 'clickaway') {
@@ -65,13 +64,13 @@ const Profile = () => {
         setSnackOpen(false);
     };
 
-    const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false)
+    const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
 
     const [dialogAuction, setDialogAuction] = React.useState<any>({
         image_filename: ""
-    })
+    });
     const handleDeleteDialogOpen = (auction: any) => {
-        setDialogAuction(auction)
+        setDialogAuction(auction);
         setOpenDeleteDialog(true);
     };
     const handleDeleteDialogClose = () => {
@@ -81,15 +80,15 @@ const Profile = () => {
         setOpenDeleteDialog(false);
     };
 
-    const [openUpdateDialog, setOpenUpdateDialog] = React.useState(false)
+    const [openUpdateDialog, setOpenUpdateDialog] = React.useState(false);
     const [editUser, setEditUser] = React.useState<any>({email:"",
                                                                     firstName:"",
-                                                                    lastName:""})
+                                                                    lastName:""});
     const [dialogUser, setDialogUser] = React.useState<any>({email:"",
                                                                         firstName:"",
-                                                                        lastName:""})
+                                                                        lastName:""});
     const handleEditDialogOpen = (user: any) => {
-        setDialogUser(user)
+        setDialogUser(user);
         setOpenUpdateDialog(true);
     };
 
@@ -138,15 +137,15 @@ const Profile = () => {
 
 
     React.useEffect(() => {
-        getUser()
-        getUserImage()
-    },[userImage])
+        getUser();
+        getUserImage();
+    },[userImage]);
 
     const updateUser = () => {
          if(newpassword.password !== ""){
             if(newpassword.password.length < 6) {
-                setEditFlag(true)
-                setEditMessage("New Password much be at least 6 characters in length!")
+                setEditFlag(true);
+                setEditMessage("New Password much be at least 6 characters in length!");
             } else {
                 axios.patch('http://localhost:4941/api/v1/users/' + localStorage.getItem("userId"), {
                     "password": newpassword.password,
@@ -154,16 +153,16 @@ const Profile = () => {
                 }, {headers:
                         {'X-Authorization': localStorage.getItem("auth_token")!}})
                     .then((response) => {
-                        handleEditDialogClose()
-                        setSnackMessage("Edit Profile successfully")
-                        setSnackOpen(true)
-                        getUser()
+                        handleEditDialogClose();
+                        setSnackMessage("Edit Profile successfully");
+                        setSnackOpen(true);
+                        getUser();
                         if (file !== '') {
-                            uploadProfilePic()
+                            uploadProfilePic();
                         }
                     }, (error) => {
-                        setEditFlag(true)
-                        setEditMessage(error.response.statusText)
+                        setEditFlag(true);
+                        setEditMessage(error.response.statusText);
                     })
             }
         } else{
@@ -174,50 +173,49 @@ const Profile = () => {
             }, {headers:
                     {'X-Authorization': localStorage.getItem("auth_token")!}})
                 .then((response) => {
-                    handleEditDialogClose()
-                    setSnackMessage("Edit Profile successfully")
-                    setSnackOpen(true)
-                    getUser()
+                    handleEditDialogClose();
+                    setSnackMessage("Edit Profile successfully");
+                    setSnackOpen(true);
+                    getUser();
                     if (file !== '') {
-                        uploadProfilePic()
+                        uploadProfilePic();
                     }
                 }, (error) => {
-                    setEditFlag(true)
-                    setEditMessage(error.response.statusText)
+                    setEditFlag(true);
+                    setEditMessage(error.response.statusText);
                 })
         }
-    }
+    };
 
     const getUserImage = () => {
         axios.get('http://localhost:4941/api/v1/users/' + localStorage.getItem('userId') + '/image')
             .then((response) => {
-                setUserImage(response.data)
+                setUserImage(response.data);
             },() => {
-                setUserImage(null)
+                setUserImage(null);
             })
-
-    }
+    };
 
     const deleteImage = () => {
         axios.delete('http://localhost:4941/api/v1/users/' + localStorage.getItem('userId') + '/image', {
             headers:
                 {'X-Authorization': localStorage.getItem("auth_token")!}})
             .then(()=> {
-                handleDeleteDialogClose()
-                getUser()
+                handleDeleteDialogClose();
+                getUser();
             }, (error) => {
-                setErrorFlag(true)
-                setErrorMessage(error.toString())
+                setErrorFlag(true);
+                setErrorMessage(error.toString());
             })
-        window.location.href = window.location.href
-        setSnackMessage("Delete Profile picture successfully")
-        setSnackOpen(true)
-    }
+        window.location.href = window.location.href;
+        setSnackMessage("Delete Profile picture successfully");
+        setSnackOpen(true);
+    };
 
     const updateImageState = (event: any) => {
-        setFile(event.target.files[0])
-        setFileType(event.target.files[0].type)
-    }
+        setFile(event.target.files[0]);
+        setFileType(event.target.files[0].type);
+    };
 
     const uploadProfilePic = () => {
         axios.put('http://localhost:4941/api/v1/users/' + localStorage.getItem('userId') + '/image', file, {
@@ -226,61 +224,61 @@ const Profile = () => {
                 'Content-Type': filetype}
         })
             .then(()=>{
-                handleEditDialogClose()
+                handleEditDialogClose();
             }, () => {
-                setErrorFlag(true)
-                setErrorMessage("Image must be jpg/gif/png")
+                setErrorFlag(true);
+                setErrorMessage("Image must be jpg/gif/png");
             })
-        window.location.href = window.location.href
-        setSnackMessage("Edit Profile successfully")
-        setSnackOpen(true)
-    }
+        window.location.href = window.location.href;
+        setSnackMessage("Edit Profile successfully");
+        setSnackOpen(true);
+    };
 
     const getUser = () => {
         if(localStorage.getItem('userId') === null) {
-            setLoginFlag(true)
-            setLoginMessage("Please login to view your profile!")
+            setLoginFlag(true);
+            setLoginMessage("Please login to view your profile!");
         } else {
             axios.get('http://localhost:4941/api/v1/users/' + localStorage.getItem('userId'), {headers:
                     {'X-Authorization': localStorage.getItem("auth_token")!}})
                 .then((response)=> {
-                    setErrorFlag(false)
-                    setErrorMessage("")
-                    setUserDetails(response.data)
-                    updateFirstNameState(response.data.firstName)
-                    updateLastNameState(response.data.lastName)
-                    updateEmailState(response.data.email)
-                    setNewLastName(response.data.lastName)
-                    setNewFirstname(response.data.firstName)
-                    setNewEmail(response.data.email)
+                    setErrorFlag(false);
+                    setErrorMessage("");
+                    setUserDetails(response.data);
+                    updateFirstNameState(response.data.firstName);
+                    updateLastNameState(response.data.lastName);
+                    updateEmailState(response.data.email);
+                    setNewLastName(response.data.lastName);
+                    setNewFirstname(response.data.firstName);
+                    setNewEmail(response.data.email);
                 }, (error) => {
-                    setErrorFlag(true)
-                    setErrorMessage(error.toString())
+                    setErrorFlag(true);
+                    setErrorMessage(error.toString());
                 })
         }
-    }
+    };
 
 
     const updateFirstNameState = (x: any) => {
-        setFirstname(x)
-    }
+        setFirstname(x);
+    };
     const updateLastNameState = (x: any) => {
-        setLastName(x)
-    }
+        setLastName(x);
+    };
     const updateEmailState = (x: any) => {
-        setEmail(x)
-    }
+        setEmail(x);
+    };
 
     const updateNewFirstNameState = (event: any) => {
         if(event.target.value.length > 0) {
             setFirstNameError(false);
             setFirstNameHelperText("");
-            setNewFirstname(event.target.value)
+            setNewFirstname(event.target.value);
         } else {
             setFirstNameError(true);
             setFirstNameHelperText("Please enter First name");
         }
-    }
+    };
 
     const updateNewLastNameState = (event: any) => {
         if(event.target.value.length > 0) {
@@ -291,7 +289,7 @@ const Profile = () => {
             setLastNameError(true);
             setLastNameHelperText("Please enter First name");
         }
-    }
+    };
 
     const updateNewEmailState = (event: any) => {
         if (event.target.value.match("^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+")) {
@@ -302,11 +300,11 @@ const Profile = () => {
             setEmailError(true);
             setEmailHelperText("Please enter a valid email");
         }
-    }
+    };
 
     const getImageDefault = (event: any) => {
-        event.target.src = "https://icon-library.com/images/default-profile-icon/default-profile-icon-24.jpg"
-    }
+        event.target.src = "https://icon-library.com/images/default-profile-icon/default-profile-icon-24.jpg";
+    };
 
     const profile_rows = () => {
         return (
@@ -388,12 +386,12 @@ const Profile = () => {
                 }
             </Paper>
         )
-    }
+    };
 
     const text: CSS.Properties = {
         fontSize: "24px",
         color: '#fff'
-    }
+    };
 
     const HeadingText: CSS.Properties = {
         width: "58%",
@@ -402,7 +400,7 @@ const Profile = () => {
         marginTop: "24px",
         fontWeight: 'bold',
         color: '#fff'
-    }
+    };
 
     const cardMain: CSS.Properties = {
         padding: "10px",
@@ -413,7 +411,7 @@ const Profile = () => {
         textAlign: 'center',
         backgroundColor: '#261C2C',
         borderRadius: "15px"
-    }
+    };
 
     const cardDiv: CSS.Properties = {
         padding: "10px",
@@ -423,21 +421,21 @@ const Profile = () => {
         backgroundColor: '#827397',
         marginBottom: "20px",
         borderRadius: "15px"
-    }
+    };
 
     const buttonStyle: CSS.Properties = {
         display:"inline-block",
         width: "50%",
         margin: "left",
         padding:"5px",
-    }
+    };
 
     const textBox: CSS.Properties = {
         width: "45%",
         margin: "auto",
         textAlign: 'left',
         padding: "5px 5px"
-    }
+    };
 
     return (
         <div>
@@ -469,7 +467,7 @@ const Profile = () => {
                     {localStorage.length !== 0 ?
                         <div>
                             <div style={buttonStyle}>
-                                <Stack direction="row" spacing={3} justifyContent="left">
+                                <Stack direction="row" spacing={3} justifyContent="center">
                                     <Button variant="contained" color="secondary" endIcon={<EditIcon/>} onClick={() => {handleEditDialogOpen(userDetails)}}>
                                         Edit Profile
                                     </Button>
@@ -577,48 +575,12 @@ const Profile = () => {
                                     </Snackbar>
                                 </Stack>
                             </div>
-                            <div style={{display:"inline-block",
-                                marginBottom: "10px",
-                                padding: "5px"}}>
-                                <Stack direction="row" spacing={3} justifyContent="left">
-                                    <Button variant="contained" endIcon={<ArticleIcon/>}>
-                                        View Bids
-                                    </Button>
-                                </Stack>
-                            </div>
-                            <div style={{display:"inline-block",
-                                marginBottom: "10px",
-                                padding: "5px"}}>
-                                <Stack direction="row" spacing={3} justifyContent="left">
-                                    <Button variant="contained" endIcon={<ArticleIcon/>}>
-                                        View Selling
-                                    </Button>
-                                </Stack>
-                            </div>
                         </div>:
                         <div>
                             <div style={buttonStyle}>
-                                <Stack direction="row" spacing={3} justifyContent="left">
+                                <Stack direction="row" spacing={3} justifyContent="center">
                                     <Button variant="contained" color="secondary" endIcon={<EditIcon/>} disabled>
                                         Edit Profile
-                                    </Button>
-                                </Stack>
-                            </div>
-                            <div style={{display:"inline-block",
-                                marginBottom: "10px",
-                                padding: "5px"}}>
-                                <Stack direction="row" spacing={3} justifyContent="left">
-                                    <Button variant="contained" endIcon={<ArticleIcon/>} disabled>
-                                        View Bids
-                                    </Button>
-                                </Stack>
-                            </div>
-                            <div style={{display:"inline-block",
-                                marginBottom: "10px",
-                                padding: "5px"}}>
-                                <Stack direction="row" spacing={3} justifyContent="left">
-                                    <Button variant="contained" endIcon={<ArticleIcon/>} disabled>
-                                        View Selling
                                     </Button>
                                 </Stack>
                             </div>

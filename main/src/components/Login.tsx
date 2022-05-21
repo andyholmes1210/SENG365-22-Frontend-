@@ -24,10 +24,10 @@ const Login = () => {
         showPassword: boolean;
     }
 
-    const navigate = useNavigate()
-    const [errorFlag, setErrorFlag] = React.useState(false)
-    const [errorMessage, setErrorMessage] = React.useState("")
-    const [email, setEmail] = React.useState("")
+    const navigate = useNavigate();
+    const [errorFlag, setErrorFlag] = React.useState(false);
+    const [errorMessage, setErrorMessage] = React.useState("");
+    const [email, setEmail] = React.useState("");
     const [password, setPassword] = React.useState<State>({
         password: '',
         showPassword: false,
@@ -50,28 +50,28 @@ const Login = () => {
     };
 
     const updateEmailState = (event: any) => {
-        setEmail(event.target.value)
-    }
+        setEmail(event.target.value);
+    };
 
     const loginUser = () => {
         if (email === "" || password.password === "") {
-            setErrorMessage("Please enter all the fields!")
-            setErrorFlag(true)
+            setErrorMessage("Please enter all the fields!");
+            setErrorFlag(true);
         } else {
             axios.post('http://localhost:4941/api/v1/users/login', {
                 "email": email,
                 "password": password.password
             })
                 .then((response) => {
-                    localStorage.setItem("auth_token", response.data.token)
-                    localStorage.setItem("userId", response.data.userId)
-                    navigate("/")
+                    localStorage.setItem("auth_token", response.data.token);
+                    localStorage.setItem("userId", response.data.userId);
+                    navigate("/");
                 }, (error) => {
-                    setErrorMessage(error.response.statusText)
-                    setErrorFlag(true)
+                    setErrorMessage(error.response.statusText);
+                    setErrorFlag(true);
                 })
         }
-    }
+    };
 
 
     const login_rows = () => {
@@ -113,20 +113,20 @@ const Login = () => {
                 </div>
             </Paper>
         )
-    }
+    };
 
     const text: CSS.Properties = {
         padding: "10px",
         marginTop: "18px",
         fontSize: "15px"
-    }
+    };
 
     const textBox: CSS.Properties = {
         width: "58%",
         margin: "auto",
         textAlign: 'left',
         marginTop: "18px",
-    }
+    };
 
     const cardMain: CSS.Properties = {
         padding: "10px",
@@ -136,7 +136,7 @@ const Login = () => {
         textAlign: 'center',
         backgroundColor: '#261C2C',
         borderRadius: "15px"
-    }
+    };
 
     const cardDiv: CSS.Properties = {
         padding: "10px",
@@ -146,7 +146,7 @@ const Login = () => {
         backgroundColor: '#827397',
         marginBottom: "20px",
         borderRadius: "15px"
-    }
+    };
 
     return (
         <div>
