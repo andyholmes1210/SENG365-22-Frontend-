@@ -139,7 +139,7 @@ const Profile = () => {
     React.useEffect(() => {
         getUser();
         getUserImage();
-    },[userImage]);
+    },[]);
 
     const updateUser = () => {
          if(newpassword.password !== ""){
@@ -557,9 +557,14 @@ const Profile = () => {
                                         </DialogContent>
                                         <DialogActions>
                                             <Button onClick={handleEditDialogClose}>Cancel</Button>
-                                            <Button variant="outlined" color="success" data-dismiss="model" onClick={() => {updateUser()}} autoFocus>
+                                            {firstnameerror === true || lastnameerror === true?
+                                                <Button variant="outlined" color="success" data-dismiss="model" disabled>
                                                 Update
-                                            </Button>
+                                                </Button>:
+                                                <Button variant="outlined" color="success" data-dismiss="model" onClick={() => {updateUser()}} autoFocus>
+                                                    Update
+                                                </Button>
+                                            }
                                         </DialogActions>
                                     </Dialog>
                                     <Snackbar

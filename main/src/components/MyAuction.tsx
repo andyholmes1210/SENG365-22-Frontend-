@@ -33,7 +33,7 @@ const MyAuction = () => {
     const getBidderIdAuctions = () => {
         if(localStorage.getItem('userId') === null) {
             setBidderAuctionFlag(true);
-            setBidderAuctionMessage("Please login to view your Bid Auction!");
+            setBidderAuctionMessage("Please login to view your Bid Auctions!");
         } else {
             axios.get('http://localhost:4941/api/v1/auctions?bidderId=' + bidderId)
                 .then((response) => {
@@ -50,7 +50,7 @@ const MyAuction = () => {
     const getSellerIdAuctions = () => {
         if(localStorage.getItem('userId') === null) {
             setSellerAuctionFlag(true);
-            setSellerAuctionMessage("Please login to view your Sell Auction!");
+            setSellerAuctionMessage("Please login to view your Sell Auctions!");
         } else {
             axios.get('http://localhost:4941/api/v1/auctions?sellerId=' + sellerId)
                 .then((response) => {
@@ -85,13 +85,10 @@ const MyAuction = () => {
     };
 
     const checkDate = (x: any) => {
-        const daysBetween: number = (Math.trunc((new Date(x).getTime() - new Date().getTime())/(86400 * 1000)));
-        if (daysBetween < 0) {
+        const daysBetween: number = (Math.ceil((new Date(x).getTime() - new Date().getTime())/(86400 * 1000)));
+        if (daysBetween <= 0) {
             return <h6 style={{fontSize: "15px",
                 color: '#FF0000'}}> Auction End </h6>;
-        } if (daysBetween === 0) {
-            return <h6 style={{fontSize: "15px",
-                color: '#950101'}}> Close Today </h6>;
         } if (daysBetween === 1) {
             return <h6 style={{fontSize: "15px",
                 color: '#CD5700'}}> Close in {daysBetween} day </h6>;
@@ -129,10 +126,10 @@ const MyAuction = () => {
     const sellAuction_rows = () => {
         return (sellAuction.map((row) =>
                 <Paper elevation={24} style={{
-                    display:"inline-block",
+                    float: "left",
                     height: "480px",
                     width: "330px",
-                    margin: "5px",
+                    margin: "18px",
                     padding: "5px",
                     textAlign: "center",
                     alignContent: "center",
@@ -206,10 +203,10 @@ const MyAuction = () => {
     const BidAuction_rows = () => {
         return (bidAuction.map((row) =>
                 <Paper elevation={24} style={{
-                    display:"inline-block",
+                    float: "left",
                     height: "480px",
                     width: "330px",
-                    margin: "5px",
+                    margin: "18px",
                     padding: "5px",
                     textAlign: "center",
                     alignContent: "center",
@@ -304,36 +301,50 @@ const MyAuction = () => {
                     </Alert>
                     :""}
                 <Paper elevation={24} style={cardMain}>
-                    <h1 style={{fontSize: "50px",
-                        textAlign: "center",
-                        fontWeight: 'bold',
-                        fontStyle: 'italic',
-                        color: '#fff',
-                        textShadow: "3px 3px #5C527F",
-                        textDecorationLine: 'underline'}}>My Bid Auctions</h1>
-                    {bidderFlag?
-                        <Alert severity="info" variant="filled">
-                            {bidderMessage}
-                        </Alert>
-                        :""}
                     <div>
+                        <h1 style={{fontSize: "50px",
+                            textAlign: "center",
+                            fontWeight: 'bold',
+                            fontStyle: 'italic',
+                            color: '#fff',
+                            textShadow: "3px 3px #5C527F",
+                            textDecorationLine: 'underline'}}>My Bid Auctions</h1>
+                        {bidderFlag?
+                            <Alert severity="info" variant="filled">
+                                {bidderMessage}
+                            </Alert>
+                            :""}
+                    </div>
+                    <div style={{
+                        display:"inline-block",
+                        width: "100%",
+                        marginTop: "1%",
+                        marginBottom: "1%",
+                    }}>
                         {BidAuction_rows()}
                     </div>
                 </Paper>
                 <Paper elevation={24} style={cardMain}>
-                    <h1 style={{fontSize: "50px",
-                        textAlign: "center",
-                        fontWeight: 'bold',
-                        fontStyle: 'italic',
-                        color: '#fff',
-                        textShadow: "3px 3px #5C527F",
-                        textDecorationLine: 'underline'}}>My Sell Auctions</h1>
-                    {sellerFlag?
-                        <Alert severity="info" variant="filled">
-                            {sellerMessage}
-                        </Alert>
-                        :""}
                     <div>
+                        <h1 style={{fontSize: "50px",
+                            textAlign: "center",
+                            fontWeight: 'bold',
+                            fontStyle: 'italic',
+                            color: '#fff',
+                            textShadow: "3px 3px #5C527F",
+                            textDecorationLine: 'underline'}}>My Sell Auctions</h1>
+                        {sellerFlag?
+                            <Alert severity="info" variant="filled">
+                                {sellerMessage}
+                            </Alert>
+                            :""}
+                    </div>
+                    <div style={{
+                        display:"inline-block",
+                        width: "100%",
+                        marginTop: "1%",
+                        marginBottom: "1%",
+                    }}>
                         {sellAuction_rows()}
                     </div>
                 </Paper>

@@ -66,10 +66,15 @@ const Auctions = () => {
     const [file, setFile] = React.useState("");
     const [filetype, setFileType] = React.useState("");
     const [title, setTitle] = React.useState("");
+    const [TitleError, setTitleError] = React.useState(false);
+    const [TitleHelperText, setTitleHelperText] = React.useState("");
     const [category, setCategory] = React.useState("");
     const [endDate, setEndDate] = React.useState<Date | null>(new Date());
     const [description, setDescription] = React.useState("");
+    const [DescriptionError, setDescriptionError] = React.useState(false);
+    const [DescriptionHelperText, setDescriptionHelperText] = React.useState("");
     const [reservePrice, setReservePrice] = React.useState(1);
+    const [ReserveError, setReserveError] = React.useState(false);
     const [AuctionFlag, setAuctionFlag] = React.useState(false);
     const [AuctionMessage, setAuctionMessage] = React.useState("");
 
@@ -212,13 +217,10 @@ const Auctions = () => {
     };
 
     const checkDate = (x: any) => {
-        const daysBetween: number = (Math.trunc((new Date(x).getTime() - new Date().getTime())/(86400 * 1000)));
-        if (daysBetween < 0) {
+        const daysBetween: number = (Math.ceil((new Date(x).getTime() - new Date().getTime())/(86400 * 1000)));
+        if (daysBetween <= 0) {
             return <h6 style={{fontSize: "15px",
                 color: '#FF0000'}}> Auction End </h6>;
-        } if (daysBetween === 0) {
-            return <h6 style={{fontSize: "15px",
-                color: '#950101'}}> Close Today </h6>;
         } if (daysBetween === 1) {
             return <h6 style={{fontSize: "15px",
                 color: '#CD5700'}}> Close in {daysBetween} day </h6>;
@@ -246,15 +248,34 @@ const Auctions = () => {
     };
 
     const updateTitleState = (event: any) => {
-        setTitle(event.target.value);
+        if(event.target.value.length === 0) {
+            setTitleError(true);
+            setTitleHelperText("Please enter Title");
+        } else {
+            setTitleError(false);
+            setTitleHelperText("");
+            setTitle(event.target.value);
+        }
     };
 
     const updateDescriptionState = (event: any) => {
-        setDescription(event.target.value);
+        if(event.target.value.length === 0) {
+            setDescriptionError(true);
+            setDescriptionHelperText("Please enter Description");
+        } else {
+            setDescriptionError(false);
+            setDescriptionHelperText("");
+            setDescription(event.target.value);
+        }
     };
 
     const updateReserveState = (event: any) => {
-        setReservePrice(+event.target.value);
+        if(Number(+event.target.value) < 1){
+            setReserveError(true);
+        } else {
+            setReserveError(false);
+            setReservePrice(+event.target.value);
+        }
     };
 
 
@@ -403,7 +424,8 @@ const Auctions = () => {
                                                label="Title"
                                                multiline
                                                maxRows={2}
-                                               helperText="Please enter a Title"
+                                               helperText={TitleHelperText}
+                                               error={TitleError}
                                                defaultValue={title}
                                                onChange={updateTitleState}/>
                                 </DialogContent>
@@ -412,7 +434,8 @@ const Auctions = () => {
                                                label="Description"
                                                multiline
                                                maxRows={4}
-                                               helperText="Please enter a Description"
+                                               helperText={DescriptionHelperText}
+                                               error={DescriptionError}
                                                defaultValue={description}
                                                onChange={updateDescriptionState}/>
                                 </DialogContent>
@@ -422,6 +445,7 @@ const Auctions = () => {
                                         <OutlinedInput
                                             id="outlined-adornment-amount"
                                             value={reservePrice}
+                                            error={ReserveError}
                                             onChange={updateReserveState}
                                             startAdornment={<InputAdornment position="start">$</InputAdornment>}
                                             label="Amount"
@@ -474,9 +498,14 @@ const Auctions = () => {
                                 </DialogContent>
                                 <DialogActions>
                                     <Button onClick={handleAddAuctionDialogClose}>Cancel</Button>
+                                    { ReserveError === true || TitleError === true || DescriptionError === true?
+                                        <Button variant="outlined" color="success" disabled>
+                                            Add
+                                        </Button>:
                                         <Button variant="outlined" color="success" onClick={() => {addAuction()}} autoFocus>
                                             Add
                                         </Button>
+                                    }
                                 </DialogActions>
                             </Dialog>
                             <Snackbar

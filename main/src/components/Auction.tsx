@@ -66,23 +66,20 @@ const Auction = () => {
 
     const [file, setFile] = React.useState("");
     const [filetype, setFileType] = React.useState("");
-    const [userImage, setUserImage] = React.useState(null);
 
     const [title, setTitle] = React.useState("");
-    const [newTitle, setNewTitle] = React.useState("");
     const [TitleError, setTitleError] = React.useState(false);
     const [TitleHelperText, setTitleHelperText] = React.useState("");
 
     const [description, setDescription] = React.useState("");
-    const [newDescription, setNewDescription] = React.useState("");
     const [DescriptionError, setDescriptionError] = React.useState(false);
     const [DescriptionHelperText, setDescriptionHelperText] = React.useState("");
 
-    const [categories, setCategories] = React.useState<any>({});
+    const [categories, setCategories] = React.useState<any>("");
     const [newCategories, setNewCategories] = React.useState("");
 
     const [endDate, setEndDate] = React.useState<Date | any>(new Date());
-    const [newEndDate, setNewEndDate] = React.useState<Date | any>(new Date());
+    // const [newEndDate, setNewEndDate] = React.useState<Date | any>(new Date());
 
     const [reserve, setReserve] = React.useState(0);
     const [newReserve, setNewReserve] = React.useState(0);
@@ -264,7 +261,7 @@ const Auction = () => {
                 updateTitleState(response.data.title);
                 updateDescriptionState(response.data.description);
                 updateReserveState(response.data.reserve);
-                updateCategoryIdState(response.data.categoryId);
+                setCategories(response.data.categoryId);
                 updateEndDateState(response.data.endDate);
             }, (error) => {
                 setErrorFlag(true);
@@ -285,30 +282,25 @@ const Auction = () => {
     };
 
     const updateAuction = () => {
-        if (endDate === null || endDate < new Date()){
-            setEditAuctionFlag(true);
-            setEditAuctionMessage("Must Provide an End Date!");
-        } else if(title === ""){
-            setEditAuctionFlag(true);
-            setEditAuctionMessage("Must Provide a Title!");
-        } else if (description === ""){
-            setEditAuctionFlag(true);
-            setEditAuctionMessage("Must Provide a Description!");
+        if (newCategories.length === 0){
+            setNewCategories(categories)
         } else {
             axios.patch('http://localhost:4941/api/v1/auctions/' + id, {
-                    "title": newTitle,
-                    "description": newDescription,
-                    "reserve": newReserve,
-                    "endDate": endDate,
+                    "title": title,
+                    "description": description,
+                    "reserve": reserve,
+                    "endDate": new Date(endDate).toISOString().replace("T", " ").replace("Z", ""),
                     "categoryId": newCategories
                 },
-                {headers: {'X-Authorization' : localStorage.getItem("auth_token")!}})
+                {headers: {'X-Authorization': localStorage.getItem("auth_token")!}})
                 .then(() => {
+                    handleEditDialogClose();
+                    getOneAuction();
                     if (file !== '') {
                         uploadAuctionPic();
                     }
-                    getOneAuction();
                 }, (error) => {
+                    console.log(error)
                     setErrorFlag(true);
                     setErrorMessage(error.toString());
                 })
@@ -331,6 +323,7 @@ const Auction = () => {
                 setErrorFlag(true);
                 setErrorMessage("Image must be jpg/gif/png");
             })
+        window.location.href = window.location.href;
     };
 
     const postBid = () => {
@@ -473,17 +466,12 @@ const Auction = () => {
     const updateEndDateState = (x: any) => {
         setEndDate(x);
     };
-    const updateCategoryIdState = (i: any) => {
-        allCategory.filter(function checkCategory(x:any) {
-            return x.categoryId === i;
-        }).map((x) => setCategories(x))
-    };
 
     const updateNewTitleState = (event: any) => {
         if(event.target.value.length > 0) {
             setTitleError(false);
             setTitleHelperText("");
-            setNewTitle(event.target.value);
+            setTitle(event.target.value);
         } else {
             setTitleError(true);
             setTitleHelperText("Please enter Title");
@@ -494,16 +482,17 @@ const Auction = () => {
         if(event.target.value.length > 0) {
             setDescriptionError(false);
             setDescriptionHelperText("");
-            setNewDescription(event.target.value);
+            setDescription(event.target.value);
         } else {
             setDescriptionError(true);
-            setDescriptionHelperText("Please enter Title");
+            setDescriptionHelperText("Please enter Description");
         }
     };
+
     const updateNewReserveState = (event: any) => {
-        if(reserve <= event.target.value){
+        if(0 < Number(+event.target.value)){
             setReserveError(false);
-            setNewReserve(+event.target.value);
+            setReserve(+event.target.value);
         } else {
             setReserveError(true);
         }
@@ -947,13 +936,8 @@ const Auction = () => {
                                 <DialogTitle id="alert-dialog-title">
                                     {"Edit Auction"}
                                 </DialogTitle>
-                                {EditAuctionFlag?
-                                    <Alert severity="error" variant="filled" >
-                                        {EditAuctionMessage}
-                                    </Alert>
-                                    :""}
                                 <DialogContent>
-                                    <h5>Select a new profile picture (optional):</h5>
+                                    <h5>Select a new Auction Picture (optional):</h5>
                                     <input type="file" onChange={updateImageState} accept="image/png, image/jpeg, image/gif" name="myfile"/>
                                 </DialogContent>
                                 <DialogContent style={{padding: "10px 10px"}}>
@@ -995,7 +979,7 @@ const Auction = () => {
                                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                                         <DesktopDateTimePicker
                                             label="Pick Date and Time"
-                                            value={endDate}
+                                            value={new Date(endDate)}
                                             onChange={(newValue) => {
                                                 setEndDate(newValue);
                                             }}
@@ -1015,7 +999,7 @@ const Auction = () => {
                                         <Select
                                             labelId="demo-simple-select-label"
                                             id="demo-simple-select"
-                                            defaultValue={categories.categoryId}
+                                            defaultValue={categories}
                                             label="Category"
                                             onChange={updateNewCategoryIdState}
                                         >
@@ -1028,12 +1012,12 @@ const Auction = () => {
                                 </DialogContent>
                                 <DialogActions>
                                     <Button onClick={handleEditDialogClose}>Cancel</Button>
-                                    { ReserveError !== true?
-                                        <Button variant="outlined" color="success" onClick={() => {updateAuction()}} autoFocus>
-                                            Update
-                                        </Button>:
+                                    { ReserveError === true || TitleError === true || DescriptionError === true || EditAuctionFlag === true?
                                         <Button variant="outlined" color="success" disabled>
                                             Update
+                                        </Button>:
+                                        <Button variant="outlined" color="success" data-dismiss="model" onClick={() => {updateAuction()}} autoFocus>
+                                        Update
                                         </Button>
                                     }
                                 </DialogActions>
