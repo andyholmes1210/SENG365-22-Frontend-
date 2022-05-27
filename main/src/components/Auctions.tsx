@@ -390,6 +390,14 @@ const Auctions = () => {
             <Navbar/>
             <div>
                 <Paper elevation={10} style={card}>
+                    <div style={{}}>
+                        <TextField
+                            id="outlined-basic"
+                            variant="outlined"
+                            fullWidth
+                            label="Search"
+                        />
+                    </div>
                     <div style={{display:"inline-block",
                         width:"13%",
                         margin: "auto"}}>

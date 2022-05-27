@@ -23,7 +23,6 @@ import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 import {DesktopDateTimePicker} from "@mui/x-date-pickers";
 
-
 const Auction = () => {
 
     const allCategory = [ {categoryId: 1, name: 'Smartphones'},
@@ -79,14 +78,11 @@ const Auction = () => {
     const [newCategories, setNewCategories] = React.useState("");
 
     const [endDate, setEndDate] = React.useState<Date | any>(new Date());
-    // const [newEndDate, setNewEndDate] = React.useState<Date | any>(new Date());
+    const [EditEndDateFlag, setEditEndDateFlag] = React.useState(false);
+    const [EditEndDateMessage, setEditEndDateMessage] = React.useState("");
 
     const [reserve, setReserve] = React.useState(0);
-    const [newReserve, setNewReserve] = React.useState(0);
     const [ReserveError, setReserveError] = React.useState(false);
-
-    const [EditAuctionFlag, setEditAuctionFlag] = React.useState(false);
-    const [EditAuctionMessage, setEditAuctionMessage] = React.useState("");
 
     const [similarauction, setSimilarAuction] = React.useState<Array<any>>([{
         auctionId: 0,
@@ -262,7 +258,7 @@ const Auction = () => {
                 updateDescriptionState(response.data.description);
                 updateReserveState(response.data.reserve);
                 setCategories(response.data.categoryId);
-                updateEndDateState(response.data.endDate);
+                updateEndDateState(changeDate(response.data.endDate));
             }, (error) => {
                 setErrorFlag(true);
                 setErrorMessage(error.toString());
@@ -282,7 +278,7 @@ const Auction = () => {
     };
 
     const updateAuction = () => {
-        if (newCategories.length === 0){
+        if (newCategories === ""){
             setNewCategories(categories)
         } else {
             axios.patch('http://localhost:4941/api/v1/auctions/' + id, {
@@ -405,7 +401,10 @@ const Auction = () => {
     };
 
     const changeDate = (x: string) => {
-        return new Date(x).toLocaleString();
+        const userOffset = new Date().getTimezoneOffset()*60*1000;
+        const localDate = new Date(x);
+        const utcDate = new Date(localDate.getTime() - userOffset);
+        return utcDate.toLocaleString();
     };
 
     const checkNull = (x: any) => {
@@ -870,6 +869,9 @@ const Auction = () => {
         marginBottom: "15px"
     };
 
+    console.log(new Date(endDate))
+
+
     return (
         <div>
             <NavTop/>
@@ -936,6 +938,11 @@ const Auction = () => {
                                 <DialogTitle id="alert-dialog-title">
                                     {"Edit Auction"}
                                 </DialogTitle>
+                                {EditEndDateFlag?
+                                    <Alert severity="error" variant="filled" >
+                                        {EditEndDateMessage}
+                                    </Alert>
+                                    :""}
                                 <DialogContent>
                                     <h5>Select a new Auction Picture (optional):</h5>
                                     <input type="file" onChange={updateImageState} accept="image/png, image/jpeg, image/gif" name="myfile"/>
@@ -979,9 +986,9 @@ const Auction = () => {
                                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                                         <DesktopDateTimePicker
                                             label="Pick Date and Time"
-                                            value={new Date(endDate)}
+                                            value={changeDate(endDate)}
                                             onChange={(newValue) => {
-                                                setEndDate(newValue);
+                                                setEndDate(newValue)
                                             }}
                                             renderInput={(params) => <TextField {...params} />}
                                             minDateTime={new Date()}
@@ -1012,7 +1019,7 @@ const Auction = () => {
                                 </DialogContent>
                                 <DialogActions>
                                     <Button onClick={handleEditDialogClose}>Cancel</Button>
-                                    { ReserveError === true || TitleError === true || DescriptionError === true || EditAuctionFlag === true?
+                                    { ReserveError === true || TitleError === true || DescriptionError === true?
                                         <Button variant="outlined" color="success" disabled>
                                             Update
                                         </Button>:

@@ -12,6 +12,7 @@ import {NavBottom} from "./Navbar/NavbarElement";
 
 const MyAuction = () => {
 
+
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState("");
     const [sellAuction, setSellAuction] = React.useState<Array<Auctions>>([]);
