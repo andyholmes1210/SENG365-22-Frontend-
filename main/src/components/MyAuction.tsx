@@ -116,6 +116,14 @@ const MyAuction = () => {
         }
     };
 
+    const checkNameLength = (x: string) => {
+        if (x.length > 10){
+            return x.substring(0, 10) + "..."
+        } else {
+            return x
+        }
+    }
+
     const getImageDefault = (event: any) => {
         event.target.src = "https://icon-library.com/images/default-profile-icon/default-profile-icon-24.jpg";
     };
@@ -128,7 +136,7 @@ const MyAuction = () => {
         return (sellAuction.map((row) =>
                 <Paper elevation={24} style={{
                     float: "left",
-                    height: "480px",
+                    height: "490px",
                     width: "330px",
                     margin: "18px",
                     padding: "5px",
@@ -137,7 +145,7 @@ const MyAuction = () => {
                     borderRadius: "30px",
                     backgroundColor: "#5C527F"}}>
                     <Paper elevation={20} style={{
-                        height: "450px",
+                        height: "460px",
                         borderRadius: "30px",
                         marginTop: "10px",
                         marginRight: "10px",
@@ -154,8 +162,12 @@ const MyAuction = () => {
                                  onError={getAuctionDefault} alt=""/>
                         </div>
                         <div style={{display:"inline-block",
-                            width: "300px"}}>
-                            <h1 style={{fontSize: "24px", color: '#fff'}}>{row.title}</h1>
+                            width: "300px",
+                            wordBreak: "break-all"}}>
+                            {row.title.length > 35?
+                                <h1 style={{fontSize: "24px", color: '#fff'}}>{row.title.substring(0, 35)+"..."}</h1>:
+                                <h1 style={{fontSize: "24px", color: '#fff'}}>{row.title}</h1>
+                            }
                         </div>
                         <div style={{float:"left",
                             width: "150px"}}>
@@ -170,10 +182,11 @@ const MyAuction = () => {
                             }).map((x) => x.name)} </h6>
                         </div>
                         <div style={{
-                            width: "300px"}}>
+                            width: "300px",
+                            float: "left"}}>
                             <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline', color: '#fff'}}> Seller:</h6>
                             <h6 style={{fontSize: "15px", color: '#fff'}}>
-                                {row.sellerFirstName} {row.sellerLastName} <img style={{
+                                {checkNameLength(row.sellerFirstName)} {checkNameLength(row.sellerLastName)} <img style={{
                                 height: "30px", width: "30px"}} src={"http://localhost:4941/api/v1/users/" + row.sellerId + "/image"} onError={getImageDefault} alt=""/>
                             </h6>
                         </div>
@@ -231,7 +244,8 @@ const MyAuction = () => {
                                  onError={getAuctionDefault} alt=""/>
                         </div>
                         <div style={{display:"inline-block",
-                            width: "300px"}}>
+                            width: "300px",
+                            wordBreak: "break-all"}}>
                             <h1 style={{fontSize: "24px", color: '#fff'}}>{row.title}</h1>
                         </div>
                         <div style={{float:"left",
@@ -249,7 +263,9 @@ const MyAuction = () => {
                         <div style={{
                             width: "300px"}}>
                             <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline', color: '#fff'}}> Seller:</h6>
-                            <h6 style={{fontSize: "15px", color: '#fff'}}>
+                            <h6 style={{fontSize: "15px",
+                                color: '#fff',
+                                wordBreak: "break-all"}}>
                                 {row.sellerFirstName} {row.sellerLastName} <img style={{
                                 height: "30px", width: "30px"}} src={"http://localhost:4941/api/v1/users/" + row.sellerId + "/image"} onError={getImageDefault} alt=""/>
                             </h6>
@@ -278,9 +294,6 @@ const MyAuction = () => {
         )
     };
 
-
-
-
     const cardMain: CSS.Properties = {
         padding: "10px",
         margin: "auto",
@@ -301,54 +314,92 @@ const MyAuction = () => {
                         {errorMessage}
                     </Alert>
                     :""}
-                <Paper elevation={24} style={cardMain}>
-                    <div>
-                        <h1 style={{fontSize: "50px",
-                            textAlign: "center",
-                            fontWeight: 'bold',
-                            fontStyle: 'italic',
-                            color: '#fff',
-                            textShadow: "3px 3px #5C527F",
-                            textDecorationLine: 'underline'}}>My Bid Auctions</h1>
-                        {bidderFlag?
-                            <Alert severity="info" variant="filled">
-                                {bidderMessage}
-                            </Alert>
-                            :""}
-                    </div>
-                    <div style={{
-                        display:"inline-block",
-                        width: "100%",
-                        marginTop: "1%",
-                        marginBottom: "1%",
-                    }}>
-                        {BidAuction_rows()}
-                    </div>
-                </Paper>
-                <Paper elevation={24} style={cardMain}>
-                    <div>
-                        <h1 style={{fontSize: "50px",
-                            textAlign: "center",
-                            fontWeight: 'bold',
-                            fontStyle: 'italic',
-                            color: '#fff',
-                            textShadow: "3px 3px #5C527F",
-                            textDecorationLine: 'underline'}}>My Sell Auctions</h1>
-                        {sellerFlag?
-                            <Alert severity="info" variant="filled">
-                                {sellerMessage}
-                            </Alert>
-                            :""}
-                    </div>
-                    <div style={{
-                        display:"inline-block",
-                        width: "100%",
-                        marginTop: "1%",
-                        marginBottom: "1%",
-                    }}>
-                        {sellAuction_rows()}
-                    </div>
-                </Paper>
+                {localStorage.getItem('userId') === null ?
+                    <Paper elevation={24} style={cardMain}>
+                        <div>
+                            <h1 style={{
+                                fontSize: "50px",
+                                textAlign: "center",
+                                fontWeight: 'bold',
+                                fontStyle: 'italic',
+                                color: '#fff',
+                                textShadow: "3px 3px #5C527F",
+                                textDecorationLine: 'underline'
+                            }}>My Bid Auctions</h1>
+                            {bidderFlag ?
+                                <Alert severity="info" variant="filled">
+                                    {bidderMessage}
+                                </Alert>
+                                : ""}
+                        </div>
+                    </Paper> :
+                    <Paper elevation={24} style={cardMain}>
+                        <div>
+                            <h1 style={{
+                                fontSize: "50px",
+                                textAlign: "center",
+                                fontWeight: 'bold',
+                                fontStyle: 'italic',
+                                color: '#fff',
+                                textShadow: "3px 3px #5C527F",
+                                textDecorationLine: 'underline'
+                            }}>My Bid Auctions</h1>
+                        </div>
+                        <div style={{
+                            display: "inline-block",
+                            width: "100%",
+                            marginTop: "1%",
+                            marginBottom: "1%",
+                        }}>
+                            {bidAuction.length > 0 ? BidAuction_rows() : <h1 style={{
+                                fontSize: "50px",
+                                textAlign: "center",
+                                fontWeight: 'bold',
+                                color: '#fff'
+                            }}>You have not bid on any Auctions</h1>}
+                        </div>
+                    </Paper>
+                }
+                {localStorage.getItem('userId') === null?
+                    <Paper elevation={24} style={cardMain}>
+                        <div>
+                            <h1 style={{fontSize: "50px",
+                                textAlign: "center",
+                                fontWeight: 'bold',
+                                fontStyle: 'italic',
+                                color: '#fff',
+                                textShadow: "3px 3px #5C527F",
+                                textDecorationLine: 'underline'}}>My Sell Auctions</h1>
+                            {sellerFlag?
+                                <Alert severity="info" variant="filled">
+                                    {sellerMessage}
+                                </Alert>
+                                :""}
+                        </div>
+                    </Paper>:
+                    <Paper elevation={24} style={cardMain}>
+                        <div>
+                            <h1 style={{fontSize: "50px",
+                                textAlign: "center",
+                                fontWeight: 'bold',
+                                fontStyle: 'italic',
+                                color: '#fff',
+                                textShadow: "3px 3px #5C527F",
+                                textDecorationLine: 'underline'}}>My Sell Auctions</h1>
+                        </div>
+                        <div style={{
+                            display:"inline-block",
+                            width: "100%",
+                            marginTop: "1%",
+                            marginBottom: "1%",
+                        }}>
+                            {sellAuction.length > 0? sellAuction_rows():<h1 style={{fontSize: "50px",
+                                textAlign: "center",
+                                fontWeight: 'bold',
+                                color: '#fff'}}>You have not create any Auctions</h1>}
+                        </div>
+                    </Paper>
+                }
             </div>
             <NavBottom/>
         </div>

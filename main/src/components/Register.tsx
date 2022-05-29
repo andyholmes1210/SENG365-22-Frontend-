@@ -22,19 +22,21 @@ const Register = () => {
     interface State {
         password: string;
         showPassword: boolean;
-    }
+    };
 
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
-    const [file, setFile] = React.useState("")
-    const [filetype, setFileType] = React.useState("")
-    const [errorFlag, setErrorFlag] = React.useState(false)
-    const [errorMessage, setErrorMessage] = React.useState("")
-    const [firstname, setFirstName] = React.useState("")
-    const [lastname, setLastName] = React.useState("")
-    const [email, setEmail] = React.useState("")
-    const [emailerror, setEmailError] = React.useState(false)
-    const [emailhelpertext, setEmailHelperText] = React.useState("")
+    const [file, setFile] = React.useState("");
+    const [filetype, setFileType] = React.useState("");
+    const [errorFlag, setErrorFlag] = React.useState(false);
+    const [errorMessage, setErrorMessage] = React.useState("");
+    const [photoFlag, setPhotoFlag] = React.useState(false);
+    const [photoMessage, setPhotoMessage] = React.useState("");
+    const [firstname, setFirstName] = React.useState("");
+    const [lastname, setLastName] = React.useState("");
+    const [email, setEmail] = React.useState("");
+    const [emailerror, setEmailError] = React.useState(false);
+    const [emailhelpertext, setEmailHelperText] = React.useState("");
 
 
     const [password, setPassword] = React.useState<State>({
@@ -72,20 +74,27 @@ const Register = () => {
             setEmailError(true);
             setEmailHelperText("Please enter a valid email");
         }
-    }
+    };
 
     const updateFirstNameState = (event: any) => {
-        setFirstName(event.target.value)
-    }
+        setFirstName(event.target.value);
+    };
 
     const updateLastNameState = (event: any) => {
-        setLastName(event.target.value)
-    }
+        setLastName(event.target.value);
+    };
 
     const updateImageState = (event: any) => {
-        setFile(event.target.files[0])
-        setFileType(event.target.files[0].type)
-    }
+        setFile(event.target.files[0]);
+        if (event.target.files[0].type !== "image/jpeg" && event.target.files[0].type !== "image/gif" && event.target.files[0].type !== "image/png") {
+            setPhotoFlag(true);
+            setPhotoMessage("Image must be jpg/gif/png");
+        } else {
+            setPhotoFlag(false)
+            setPhotoMessage("");
+            setFileType(event.target.files[0].type);
+        }
+    };
 
     const uploadProfilePic = () => {
         axios.put('http://localhost:4941/api/v1/users/' + localStorage.getItem('userId') + '/image', file, {
@@ -95,18 +104,18 @@ const Register = () => {
         })
             .then(()=>{
             }, () => {
-                setErrorFlag(true)
-                setErrorMessage("Image must be jpg/gif/png")
+                setErrorFlag(true);
+                setErrorMessage("Image must be jpg/gif/png");
             })
-    }
+    };
 
     const registerUser = () => {
         if (firstname === "" || lastname === "" || email === "" || password.password === "") {
-            setErrorMessage("Please enter all the fields!")
-            setErrorFlag(true)
+            setErrorMessage("Please enter all the fields!");
+            setErrorFlag(true);
         } else if (password.password.length < 6) {
-            setErrorMessage("Password much be at least 6 characters in length!")
-            setErrorFlag(true)
+            setErrorMessage("Password much be at least 6 characters in length!");
+            setErrorFlag(true);
         } else {
             axios.post('http://localhost:4941/api/v1/users/register', {
                 "firstName": firstname,
@@ -120,23 +129,23 @@ const Register = () => {
                         "password": password.password
                     })
                         .then((response) => {
-                            localStorage.setItem("auth_token", response.data.token)
-                            localStorage.setItem("userId", response.data.userId)
-                            navigate("/")
+                            localStorage.setItem("auth_token", response.data.token);
+                            localStorage.setItem("userId", response.data.userId);
+                            navigate("/");
                             if (file !== '') {
-                                uploadProfilePic()
-                            }
+                                uploadProfilePic();
+                            };
                         }, (error) => {
-                            setErrorFlag(true)
-                            setErrorMessage(error.toString())
+                            setErrorFlag(true);
+                            setErrorMessage(error.toString());
                         })
                 })
                 .catch((error) => {
-                    setErrorMessage("Email already in used, please try again")
-                    setErrorFlag(true)
+                    setErrorMessage("Email already in used, please try again");
+                    setErrorFlag(true);
                 })
         }
-    }
+    };
 
     const register_rows = () => {
         return (
@@ -147,13 +156,13 @@ const Register = () => {
                 </div>
 
                 <div style={textBox}>
-                    <TextField fullWidth id="standard-basic" label="First Name" value={firstname} variant="standard" onChange={updateFirstNameState}/>
+                    <TextField fullWidth id="standard-basic" inputProps={{maxLength:64}} label="First Name" value={firstname} variant="standard" onChange={updateFirstNameState}/>
                 </div>
                 <div style={textBox}>
-                    <TextField fullWidth id="standard-basic" label="Last Name" value={lastname} variant="standard" onChange={updateLastNameState}/>
+                    <TextField fullWidth id="standard-basic" inputProps={{maxLength:64}} label="Last Name" value={lastname} variant="standard" onChange={updateLastNameState}/>
                 </div>
                 <div style={textBox}>
-                    <TextField fullWidth id="standard-basic" label="Email address" helperText={emailhelpertext} error={emailerror} variant="standard" onChange={updateEmailState}/>
+                    <TextField fullWidth id="standard-basic" inputProps={{maxLength:128}} label="Email address" helperText={emailhelpertext} error={emailerror} variant="standard" onChange={updateEmailState}/>
                 </div>
                 <div style={textBox}>
                     <FormControl variant="standard">
@@ -163,6 +172,7 @@ const Register = () => {
                                type={password.showPassword ? 'text' : 'password'}
                                value={password.password}
                                onChange={handleChange('password')}
+                               inputProps={{maxLength:256}}
                                endAdornment={
                                    <InputAdornment position="end">
                                        <IconButton
@@ -181,9 +191,14 @@ const Register = () => {
                 </div>
                 <div>
                     <Stack direction="row" spacing={2} justifyContent="center">
-                        <Button variant="contained" endIcon={<AssignmentIcon/>} onClick={() => registerUser()}>
-                            Sign Up
-                        </Button>
+                        { photoFlag === true?
+                            <Button variant="contained" endIcon={<AssignmentIcon/>} disabled>
+                                Sign Up
+                            </Button>:
+                            <Button variant="contained" endIcon={<AssignmentIcon/>} onClick={() => registerUser()}>
+                                Sign Up
+                            </Button>
+                        }
                     </Stack>
                 </div>
             </Paper>
@@ -194,7 +209,7 @@ const Register = () => {
         padding: "10px",
         marginTop: "18px",
         fontSize: "15px"
-    }
+    };
 
     const imageBox: CSS.Properties = {
         width: "100%",
@@ -202,7 +217,7 @@ const Register = () => {
         textAlign: 'left',
         marginTop: "15px",
         marginBottom: "15px"
-    }
+    };
 
     const textBox: CSS.Properties = {
         width: "58%",
@@ -210,7 +225,7 @@ const Register = () => {
         textAlign: 'left',
         marginTop: "15px",
         marginBottom: "15px"
-    }
+    };
 
     const cardMain: CSS.Properties = {
         padding: "10px",
@@ -220,7 +235,7 @@ const Register = () => {
         textAlign: 'center',
         backgroundColor: '#261C2C',
         borderRadius: "15px"
-    }
+    };
 
     const cardDiv: CSS.Properties = {
         padding: "10px",
@@ -230,7 +245,8 @@ const Register = () => {
         backgroundColor: '#827397',
         marginBottom: "20px",
         borderRadius: "15px"
-    }
+    };
+
     return (
         <div>
             <Navbar/>
@@ -249,6 +265,11 @@ const Register = () => {
                         {errorFlag?
                             <Alert severity="error" variant="filled" >
                                 <strong>{errorMessage}</strong>
+                            </Alert>
+                            :""}
+                        {photoFlag?
+                            <Alert severity="error" variant="filled" >
+                                {photoMessage}
                             </Alert>
                             :""}
                     </div>

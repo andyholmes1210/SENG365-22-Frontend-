@@ -7,7 +7,7 @@ import {
     Input,
     InputAdornment,
     InputLabel,
-    Paper, Snackbar, Stack,
+    Paper, Stack,
     TextField
 } from "@mui/material";
 import React from "react";
@@ -73,22 +73,22 @@ const Login = () => {
         }
     };
 
-
     const login_rows = () => {
         return (
             <Paper elevation={10} style={cardDiv}>
                 <div style={textBox}>
-                    <TextField fullWidth id="standard-basic" label="Email" value={email} variant="standard" onChange={updateEmailState}/>
+                    <TextField fullWidth id="standard-basic" inputProps={{maxLength:128}} label="Email" value={email} variant="standard" onChange={updateEmailState}/>
                 </div>
                 <div style={textBox}>
                     <FormControl variant="standard">
                         <InputLabel htmlFor="standard-adornment-password">Password</InputLabel>
                         <Input fullWidth
-                            id="standard-adornment-password"
-                            type={password.showPassword ? 'text' : 'password'}
-                            value={password.password}
-                            onChange={handleChange('password')}
-                            endAdornment={
+                               id="standard-adornment-password"
+                               inputProps={{maxLength:256}}
+                               type={password.showPassword ? 'text' : 'password'}
+                               value={password.password}
+                               onChange={handleChange('password')}
+                               endAdornment={
                                 <InputAdornment position="end">
                                     <IconButton
                                         aria-label="toggle password visibility"

@@ -58,6 +58,8 @@ const Auctions = () => {
 
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState("");
+    const [photoFlag, setPhotoFlag] = React.useState(false);
+    const [photoMessage, setPhotoMessage] = React.useState("");
     const [auctions, setAuctions] = React.useState<Array<Auctions>>([]);
     const [categories, setCategories] = React.useState<Array<Category>>([]);
     const [count, setCount] = React.useState(10);
@@ -152,7 +154,7 @@ const Auctions = () => {
             setAuctionMessage("Reserve Price must be 1 or higher!");
         } else if (endDate === null || endDate <= new Date()){
             setAuctionFlag(true);
-            setAuctionMessage("Must Provide an End Date!");
+            setAuctionMessage("End date must be in the future!");
         } else if (category === ""){
             setAuctionFlag(true);
             setAuctionMessage("Must Provide a Category!");
@@ -192,7 +194,15 @@ const Auctions = () => {
 
     const updateImageState = (event: any) => {
         setFile(event.target.files[0]);
-        setFileType(event.target.files[0].type);
+        if (event.target.files[0].type !== "image/jpeg" && event.target.files[0].type !== "image/gif" && event.target.files[0].type !== "image/png") {
+            setPhotoFlag(true);
+            setPhotoMessage("Image must be jpg/gif/png");
+        } else {
+            setPhotoFlag(false)
+            setPhotoMessage("");
+            setFileType(event.target.files[0].type);
+        }
+
     };
 
     const uploadAuctionPic = (id: any) => {
@@ -238,7 +248,7 @@ const Auctions = () => {
             return <h6 style={{fontSize: "12px",
                 textAlign: "center",
                 fontStyle: 'italic',
-                color: 'green'}}>Reserved Met</h6>;
+                color: "#1ff550"}}>Reserved Met</h6>;
         } else {
             return <h6 style={{fontSize: "12px",
                 textAlign: "center",
@@ -246,6 +256,14 @@ const Auctions = () => {
                 color: 'red'}}>Reserved Not Met</h6>;
         }
     };
+
+    const checkNameLength = (x: string) => {
+        if (x.length > 10){
+            return x.substring(0, 10) + "..."
+        } else {
+            return x
+        }
+    }
 
     const updateTitleState = (event: any) => {
         if(event.target.value.length === 0) {
@@ -270,14 +288,12 @@ const Auctions = () => {
     };
 
     const updateReserveState = (event: any) => {
-        if(Number(+event.target.value) < 1){
-            setReserveError(true);
-        } else {
-            setReserveError(false);
+        if (isNaN(+event.target.value)) {
+            setReservePrice(1);
+        } else if(0 < Number(+event.target.value) && Number(+event.target.value) <= 999999999){
             setReservePrice(+event.target.value);
         }
     };
-
 
     const updateCategoryState = (event: any) => {
         setCategory(event.target.value);
@@ -295,7 +311,7 @@ const Auctions = () => {
         return (auctions.map((row) =>
             <Paper elevation={24} style={{
                 display:"inline-block",
-                height: "480px",
+                height: "490px",
                 width: "330px",
                 margin: "5px",
                 padding: "5px",
@@ -304,7 +320,7 @@ const Auctions = () => {
                 borderRadius: "30px",
                 backgroundColor: "#5C527F"}}>
                 <Paper elevation={20} style={{
-                    height: "450px",
+                    height: "460px",
                     borderRadius: "30px",
                     marginTop: "10px",
                     marginRight: "10px",
@@ -320,40 +336,48 @@ const Auctions = () => {
                          src={"http://localhost:4941/api/v1/auctions/" + row.auctionId + "/image"}
                          onError={getAuctionDefault} alt=""/>
                     </div>
-                    <div style={{display:"inline-block",
-                        width: "300px"}}>
-                        <h1 style={{fontSize: "24px", color: '#fff'}}>{row.title}</h1>
-                    </div>
-                    <div style={{float:"left",
-                        width: "150px"}}>
-                        <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline', color: '#fff'}}> End Date:</h6>
-                        {checkDate(row.endDate.toString())}
-                    </div>
-                    <div style={{display:"inline-block",
-                        width: "150px"}}>
-                        <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline', color: '#fff'}}> Category: </h6>
-                        <h6 style={{fontSize: "15px", color: '#fff'}}> {categories.filter(function checkCategory(x:any) {
-                            return x.categoryId === row.categoryId
-                        }).map((x) => x.name)} </h6>
-                    </div>
                     <div style={{
-                        width: "300px"}}>
-                        <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline', color: '#fff'}}> Seller:</h6>
-                        <h6 style={{fontSize: "15px", color: '#fff'}}>
-                            {row.sellerFirstName} {row.sellerLastName} <img style={{
-                            height: "30px", width: "30px"}} src={"http://localhost:4941/api/v1/users/" + row.sellerId + "/image"} onError={getImageDefault} alt=""/>
-                        </h6>
-                    </div>
-                    <div style={{float:"left",
-                        width: "150px"}}>
-                        <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline', color: '#fff'}}> Highest bid:</h6>
-                        <h6 style={{fontSize: "15px", color: '#fff'}}>${checkNull(row.highestBid)}</h6>
-                    </div>
-                    <div style={{display:"inline-block",
-                        width: "150px"}}>
-                        <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline', color: '#fff'}}> Reserve Price:</h6>
-                        <h6 style={{fontSize: "15px", color: '#fff'}}>${row.reserve}</h6>
-                        {checkReserve(row)}
+                        minHeight: "260px"
+                    }}>
+                        <div style={{display:"inline-block",
+                            width: "300px",
+                            wordBreak: "break-all"}}>
+                            {row.title.length > 35?
+                                <h1 style={{fontSize: "24px", color: '#fff'}}>{row.title.substring(0, 35)+"..."}</h1>:
+                                <h1 style={{fontSize: "24px", color: '#fff'}}>{row.title}</h1>
+                            }
+                        </div>
+                        <div style={{float:"left",
+                            width: "150px"}}>
+                            <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline', color: '#fff'}}> End Date:</h6>
+                            {checkDate(row.endDate.toString())}
+                        </div>
+                        <div style={{display:"inline-block",
+                            width: "150px"}}>
+                            <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline', color: '#fff'}}> Category: </h6>
+                            <h6 style={{fontSize: "15px", color: '#fff'}}> {categories.filter(function checkCategory(x:any) {
+                                return x.categoryId === row.categoryId
+                            }).map((x) => x.name)} </h6>
+                        </div>
+                        <div style={{
+                            width: "300px"}}>
+                            <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline', color: '#fff'}}> Seller:</h6>
+                            <h6 style={{fontSize: "15px", color: '#fff'}}>
+                                {checkNameLength(row.sellerFirstName)} {checkNameLength(row.sellerLastName)} <img style={{
+                                height: "30px", width: "30px"}} src={"http://localhost:4941/api/v1/users/" + row.sellerId + "/image"} onError={getImageDefault} alt=""/>
+                            </h6>
+                        </div>
+                        <div style={{float:"left",
+                            width: "150px"}}>
+                            <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline', color: '#fff'}}> Highest bid:</h6>
+                            <h6 style={{fontSize: "15px", color: '#fff'}}>${checkNull(row.highestBid)}</h6>
+                        </div>
+                        <div style={{display:"inline-block",
+                            width: "150px"}}>
+                            <h6 style={{fontWeight: 'bold', textDecorationLine: 'underline', color: '#fff'}}> Reserve Price:</h6>
+                            <h6 style={{fontSize: "15px", color: '#fff'}}>${row.reserve}</h6>
+                            {checkReserve(row)}
+                        </div>
                     </div>
                     <div>
                         <Btn>
@@ -423,6 +447,11 @@ const Auctions = () => {
                                         {AuctionMessage}
                                     </Alert>
                                     :""}
+                                {photoFlag?
+                                    <Alert severity="error" variant="filled" >
+                                        {photoMessage}
+                                    </Alert>
+                                    :""}
                                 <DialogContent>
                                     <h5>Select an Auction Picture:</h5>
                                     <input type="file" onChange={updateImageState} accept="image/png, image/jpeg, image/gif" name="myfile"/>
@@ -431,6 +460,7 @@ const Auctions = () => {
                                     <TextField fullWidth id="outlined-multiline-flexible"
                                                label="Title"
                                                multiline
+                                               inputProps={{maxLength:127}}
                                                maxRows={2}
                                                helperText={TitleHelperText}
                                                error={TitleError}
@@ -441,6 +471,7 @@ const Auctions = () => {
                                     <TextField fullWidth id="outlined-multiline-flexible"
                                                label="Description"
                                                multiline
+                                               inputProps={{maxLength:2047}}
                                                maxRows={4}
                                                helperText={DescriptionHelperText}
                                                error={DescriptionError}
@@ -453,7 +484,6 @@ const Auctions = () => {
                                         <OutlinedInput
                                             id="outlined-adornment-amount"
                                             value={reservePrice}
-                                            error={ReserveError}
                                             onChange={updateReserveState}
                                             startAdornment={<InputAdornment position="start">$</InputAdornment>}
                                             label="Amount"
@@ -506,7 +536,7 @@ const Auctions = () => {
                                 </DialogContent>
                                 <DialogActions>
                                     <Button onClick={handleAddAuctionDialogClose}>Cancel</Button>
-                                    { ReserveError === true || TitleError === true || DescriptionError === true?
+                                    { photoFlag === true || TitleError === true || DescriptionError === true?
                                         <Button variant="outlined" color="success" disabled>
                                             Add
                                         </Button>:

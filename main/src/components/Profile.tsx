@@ -34,6 +34,8 @@ const Profile = () => {
 
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState("");
+    const [photoFlag, setPhotoFlag] = React.useState(false);
+    const [photoMessage, setPhotoMessage] = React.useState("");
     const [editFlag, setEditFlag] = React.useState(false);
     const [editMessage, setEditMessage] = React.useState("");
     const [userDetails, setUserDetails] = React.useState<Array<any>>([]);
@@ -148,6 +150,9 @@ const Profile = () => {
                 setEditMessage("New Password much be at least 6 characters in length!");
             } else {
                 axios.patch('http://localhost:4941/api/v1/users/' + localStorage.getItem("userId"), {
+                    "firstName": newfirstname,
+                    "lastName": newlastname,
+                    "email": newemail,
                     "password": newpassword.password,
                     "currentPassword": password.password
                 }, {headers:
@@ -165,7 +170,10 @@ const Profile = () => {
                         setEditMessage(error.response.statusText);
                     })
             }
-        } else{
+        } else if (newpassword.password === "") {
+             setEditFlag(true);
+             setEditMessage("Invalid password(s)");
+         } else {
             axios.patch('http://localhost:4941/api/v1/users/' + localStorage.getItem("userId"), {
                 "firstName": newfirstname,
                 "lastName": newlastname,
@@ -214,7 +222,15 @@ const Profile = () => {
 
     const updateImageState = (event: any) => {
         setFile(event.target.files[0]);
-        setFileType(event.target.files[0].type);
+        if (event.target.files[0].type !== "image/jpeg" && event.target.files[0].type !== "image/gif" && event.target.files[0].type !== "image/png" ) {
+            setPhotoFlag(true);
+            setPhotoMessage("Image must be jpg/gif/png");
+        } else {
+            setPhotoFlag(false)
+            setPhotoMessage("");
+            setFileType(event.target.files[0].type);
+        }
+
     };
 
     const uploadProfilePic = () => {
@@ -390,7 +406,8 @@ const Profile = () => {
 
     const text: CSS.Properties = {
         fontSize: "24px",
-        color: '#fff'
+        color: '#fff',
+        wordBreak: "break-all"
     };
 
     const HeadingText: CSS.Properties = {
@@ -484,12 +501,18 @@ const Profile = () => {
                                                 {editMessage}
                                             </Alert>
                                             :""}
+                                        {photoFlag?
+                                            <Alert severity="error" variant="filled" >
+                                                {photoMessage}
+                                            </Alert>
+                                            :""}
                                         <DialogContent>
                                             <h5>Select a new profile picture (optional):</h5>
                                             <input type="file" onChange={updateImageState} accept="image/png, image/jpeg, image/gif" name="myfile"/>
                                         </DialogContent>
                                         <DialogContent style={textBox}>
                                             <TextField id="outlined-basic"
+                                                       inputProps={{maxLength:64}}
                                                        label="Firstname"
                                                        variant="outlined"
                                                        defaultValue={firstname}
@@ -499,6 +522,7 @@ const Profile = () => {
                                         </DialogContent>
                                         <DialogContent style={textBox}>
                                             <TextField id="outlined-basic"
+                                                       inputProps={{maxLength:64}}
                                                        label="Lastname"
                                                        variant="outlined"
                                                        defaultValue={lastname}
@@ -508,6 +532,7 @@ const Profile = () => {
                                         </DialogContent>
                                         <DialogContent style={textBox}>
                                             <TextField id="outlined-basic"
+                                                       inputProps={{maxLength:128}}
                                                        label="Email"
                                                        variant="outlined"
                                                        defaultValue={email}
@@ -520,6 +545,7 @@ const Profile = () => {
                                                 <InputLabel htmlFor="standard-adornment-password">New Password</InputLabel>
                                                 <Input fullWidth
                                                        id="standard-adornment-password"
+                                                       inputProps={{maxLength:256}}
                                                        type={newpassword.showPassword ? 'text' : 'password'}
                                                        value={newpassword.password}
                                                        onChange={handleChangeNewPassword('password')}
@@ -539,6 +565,7 @@ const Profile = () => {
                                                 <InputLabel htmlFor="standard-adornment-password">Password</InputLabel>
                                                 <Input fullWidth
                                                        id="standard-adornment-password"
+                                                       inputProps={{maxLength:256}}
                                                        type={password.showPassword ? 'text' : 'password'}
                                                        value={password.password}
                                                        onChange={handleChangePassword('password')}
@@ -557,7 +584,7 @@ const Profile = () => {
                                         </DialogContent>
                                         <DialogActions>
                                             <Button onClick={handleEditDialogClose}>Cancel</Button>
-                                            {firstnameerror === true || lastnameerror === true?
+                                            {photoFlag === true || firstnameerror === true || lastnameerror === true?
                                                 <Button variant="outlined" color="success" data-dismiss="model" disabled>
                                                 Update
                                                 </Button>:

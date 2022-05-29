@@ -56,6 +56,8 @@ const Auction = () => {
     const navigate = useNavigate();
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState("");
+    const [photoFlag, setPhotoFlag] = React.useState(false);
+    const [photoMessage, setPhotoMessage] = React.useState("");
     const [openBidderDialog, setOpenBidderDialog] = React.useState(false);
     const [openSimilarAuctionDialog, setOpenSimilarAuctionDialog] = React.useState(false);
     const [category, setCategory] = React.useState<Array<Category>>([]);
@@ -281,31 +283,39 @@ const Auction = () => {
         if (newCategories === ""){
             setNewCategories(categories)
         } else {
-            axios.patch('http://localhost:4941/api/v1/auctions/' + id, {
-                    "title": title,
-                    "description": description,
-                    "reserve": reserve,
-                    "endDate": new Date(endDate).toISOString().replace("T", " ").replace("Z", ""),
-                    "categoryId": newCategories
-                },
-                {headers: {'X-Authorization': localStorage.getItem("auth_token")!}})
-                .then(() => {
-                    handleEditDialogClose();
-                    getOneAuction();
-                    if (file !== '') {
-                        uploadAuctionPic();
-                    }
-                }, (error) => {
-                    console.log(error)
-                    setErrorFlag(true);
-                    setErrorMessage(error.toString());
-                })
-        }
+                axios.patch('http://localhost:4941/api/v1/auctions/' + id, {
+                        "title": title,
+                        "description": description,
+                        "reserve": reserve,
+                        "endDate": new Date(endDate).toISOString().replace("T", " ").replace("Z", ""),
+                        "categoryId": newCategories
+                    },
+                    {headers: {'X-Authorization': localStorage.getItem("auth_token")!}})
+                    .then(() => {
+                        if (file !== '') {
+                            uploadAuctionPic();
+                        }
+                        getOneAuction();
+                        handleEditDialogClose();
+                    }, (error) => {
+                        console.log(error)
+                        setErrorFlag(true);
+                        setErrorMessage(error.toString());
+                    })
+            }
     };
 
     const updateImageState = (event: any) => {
         setFile(event.target.files[0]);
-        setFileType(event.target.files[0].type);
+        if (event.target.files[0].type !== "image/jpeg" && event.target.files[0].type !== "image/gif" && event.target.files[0].type !== "image/png") {
+            setPhotoFlag(true);
+            setPhotoMessage("Image must be jpg/gif/png");
+        } else {
+            setPhotoFlag(false)
+            setPhotoMessage("");
+            setFileType(event.target.files[0].type);
+        }
+
     };
 
     const uploadAuctionPic = () => {
@@ -315,17 +325,17 @@ const Auction = () => {
                     'Content-Type': filetype}
         })
             .then(()=>{
-            }, () => {
-                setErrorFlag(true);
-                setErrorMessage("Image must be jpg/gif/png");
+                window.location.href = window.location.href;
+            }, (error) => {
+                setPhotoFlag(true);
+                setPhotoMessage(error.response.statusText);
             })
-        window.location.href = window.location.href;
     };
 
     const postBid = () => {
         if (bid <= 0) {
             setBidFlag(true);
-            setBidMessage("Bid must be more than 0!");
+            setBidMessage("Bid must be more than $0!");
         } else if (bid <= auction.highestBid) {
             setBidFlag(true);
             setBidMessage("Bid must be more than the highest bid!");
@@ -440,7 +450,7 @@ const Auction = () => {
             return <h6 style={{fontSize: "25px",
                 textAlign: "center",
                 fontStyle: 'italic',
-                color: 'green'}}>Reserved Met</h6>;
+                color: '#1ff550'}}>Reserved Met</h6>;
         } else {
             return <h6 style={{fontSize: "25px",
                 textAlign: "center",
@@ -450,7 +460,11 @@ const Auction = () => {
     };
 
     const updateBidState = (event: any) => {
-        setBid(+event.target.value);
+        if(isNaN(+event.target.value)) {
+            setBid(0);
+        } else if(0 < Number(+event.target.value) && Number(+event.target.value) <= 999999999){
+            setBid(+event.target.value);
+        }
     };
 
     const updateTitleState = (x: any) => {
@@ -489,7 +503,7 @@ const Auction = () => {
     };
 
     const updateNewReserveState = (event: any) => {
-        if(0 < Number(+event.target.value)){
+        if(0 < Number(+event.target.value) && Number(+event.target.value) <= 999999999){
             setReserveError(false);
             setReserve(+event.target.value);
         } else {
@@ -558,7 +572,8 @@ const Auction = () => {
                     margin: "auto"}}>
                     <h1 style={{
                         fontSize: "48px",
-                        fontWeight: 'bold'}}>{auction.title}</h1>
+                        fontWeight: 'bold',
+                        wordBreak: "break-all"}}>{auction.title}</h1>
                 </div>
                 <div style={{
                     padding: "5px"}}>
@@ -635,7 +650,7 @@ const Auction = () => {
                     width: "100%",
                     textAlign:"center"}}>
                     <h2 style={headingLeft}>Description:</h2>
-                    <h2 style={{fontSize: "20px", textAlign:"left", color: '#fff'}}>{auction.description}</h2>
+                    <h2 style={{fontSize: "20px", textAlign:"left", color: '#fff', wordBreak: "break-all"}}>{auction.description}</h2>
                 </div>
                 <div style={halfCell}>
                     <h2 style={headingCen}>Seller:</h2>
@@ -838,6 +853,7 @@ const Auction = () => {
 
     const textCen: CSS.Properties = {
         textAlign:"center",
+        wordBreak: "break-all",
         fontSize: "16px",
         color: '#fff'
     };
@@ -869,9 +885,6 @@ const Auction = () => {
         marginBottom: "15px"
     };
 
-    console.log(new Date(endDate))
-
-
     return (
         <div>
             <NavTop/>
@@ -902,6 +915,9 @@ const Auction = () => {
                                 aria-describedby="alert-dialog-description">
                                 <DialogTitle id="alert-dialog-title">
                                     {"Delete This Auction?"}
+                                    <Alert severity="error">
+                                      Remember!!! Once a bid has been placed on auction, the auction cannot be deleted
+                                    </Alert>
                                 </DialogTitle>
                                 <DialogContent>
                                     <DialogContentText id="alert-dialog-description">
@@ -937,7 +953,15 @@ const Auction = () => {
                                 aria-describedby="alert-dialog-description">
                                 <DialogTitle id="alert-dialog-title">
                                     {"Edit Auction"}
+                                    <Alert severity="error">
+                                        Remember!!! Once a bid has been placed on auction, the auction cannot be edited
+                                    </Alert>
                                 </DialogTitle>
+                                {photoFlag?
+                                    <Alert severity="error" variant="filled" >
+                                        {photoMessage}
+                                    </Alert>
+                                    :""}
                                 {EditEndDateFlag?
                                     <Alert severity="error" variant="filled" >
                                         {EditEndDateMessage}
@@ -952,6 +976,7 @@ const Auction = () => {
                                                label="Title"
                                                multiline
                                                maxRows={2}
+                                               inputProps={{maxLength:127}}
                                                variant="outlined"
                                                defaultValue={title}
                                                helperText={TitleHelperText}
@@ -963,6 +988,7 @@ const Auction = () => {
                                                label="Description"
                                                multiline
                                                maxRows={2}
+                                               inputProps={{maxLength:2047}}
                                                variant="outlined"
                                                defaultValue={description}
                                                helperText={DescriptionHelperText}
@@ -1019,7 +1045,7 @@ const Auction = () => {
                                 </DialogContent>
                                 <DialogActions>
                                     <Button onClick={handleEditDialogClose}>Cancel</Button>
-                                    { ReserveError === true || TitleError === true || DescriptionError === true?
+                                    {  photoFlag === true || ReserveError === true || TitleError === true || DescriptionError === true?
                                         <Button variant="outlined" color="success" disabled>
                                             Update
                                         </Button>:
