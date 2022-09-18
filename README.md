@@ -2,4 +2,4 @@
 
 To access the main files click on the main folder
 
-Coding using Typescript and React
+Code using Typescript and React
